@@ -1,3 +1,9 @@
+.DEFAULT_GOAL := _setup
+
+
+.PHONY: _setup
+_setup:
+	@node .github/setup.js
 # Check if go is installed
 ifeq ($(shell command -v go 2> /dev/null),)
 $(error "go is not installed. Please install Go from https://golang.org/dl/")
