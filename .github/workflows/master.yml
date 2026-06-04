@@ -85,6 +85,19 @@ jobs:
         with:
           validationfile: "configs/prod/schemas/schema.zed"
 
+      # ghcommit uses createCommitOnBranch, which requires the branch to already exist.
+      # convert-config used to delete configmaps-schema before push; it may be missing.
+      - name: Ensure configmaps-schema branch exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! git ls-remote --exit-code --heads origin configmaps-schema >/dev/null 2>&1; then
+            MASTER_SHA=$(gh api "repos/${{ github.repository }}/git/ref/heads/master" --jq .object.sha)
+            gh api "repos/${{ github.repository }}/git/refs" \
+              -f ref='refs/heads/configmaps-schema' \
+              -f sha="${MASTER_SHA}"
+          fi
+
       # GitHub API commits are verified; plain git push from convert-config is not.
       - name: Push signed commit to configmaps-schema
         uses: planetscale/ghcommit-action@v0.2.18
