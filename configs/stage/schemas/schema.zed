@@ -935,7 +935,7 @@ definition rbac/workspace {
 	permission notifications_notifications_edit = t_binding->notifications_notifications_edit + t_parent->notifications_notifications_edit
 	permission notifications_notifications_view = t_binding->notifications_notifications_view + t_parent->notifications_notifications_view
 	permission parent = t_parent
-	relation t_parent: rbac/workspace | rbac/tenant
+	relation t_parent: rbac/workspace
 	permission patch_system_edit = (inventory_host_view & patch_system_edit_assigned)
 	permission patch_system_edit_assigned = t_binding->patch_system_edit_assigned + t_parent->patch_system_edit_assigned
 	permission patch_system_view = (inventory_host_view & patch_system_view_assigned)
