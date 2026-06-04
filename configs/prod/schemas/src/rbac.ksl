@@ -47,7 +47,7 @@ internal type role_binding { // TODO: revisit cardinality based on clamping deci
 }
 
 public type workspace { //Workspace is public so services can place resources into workspaces
-    relation parent: [AtMostOne workspace or tenant]
+    relation parent: [AtMostOne workspace]
     relation binding: [Any role_binding] or parent.binding
 
     // Explicitly defined on root workspaces, otherwise inherited from the parent workspace.
