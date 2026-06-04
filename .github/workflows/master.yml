@@ -9,8 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4.1.7
+        with:
+          fetch-depth: 0
 
       - name: Configure git to trust the workspace despite the different owner
         run: git config --global --add safe.directory "${{ github.workspace }}"
@@ -109,13 +112,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create a PR with Config Changes
-        run: |
-          git fetch origin configmaps-schema
-          if [ -n "$(git log --oneline origin/master..origin/configmaps-schema)" ]; then
-            gh pr create --fill-first -B master -H configmaps-schema -t "[GitHub] - Automated ConfigMap & Schema Generation" || \
-              echo "PR may already exist for configmaps-schema"
-          else
-            echo "No new commits found between origin/master and configmaps-schema"
-          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git fetch origin master configmaps-schema
+
+          AHEAD=$(git rev-list --count origin/master..origin/configmaps-schema)
+          if [ "${AHEAD}" -eq 0 ]; then
+            echo "No commits on configmaps-schema ahead of master; skipping PR"
+            exit 0
+          fi
+          echo "configmaps-schema is ${AHEAD} commit(s) ahead of master"
+
+          EXISTING=$(gh pr list --base master --head configmaps-schema --state open --json url -q '.[0].url')
+          if [ -n "${EXISTING}" ]; then
+            echo "Open PR already exists: ${EXISTING}"
+            exit 0
+          fi
+
+          gh pr create \
+            --base master \
+            --head configmaps-schema \
+            --title "[GitHub] - Automated ConfigMap & Schema Generation" \
+            --fill-first
