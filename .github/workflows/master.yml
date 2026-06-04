@@ -55,10 +55,7 @@ jobs:
             ROLE_CONFIGMAP_FILE="${CONFIGMAPS_TARGET}/${ENV}/rbac-config.yml"
 
             for f in "${PERMISSION_CONFIGMAP_FILE}" "${ROLE_CONFIGMAP_FILE}"; do
-              echo -n 'kind: Template
-          apiVersion: v1
-          objects:
-          - ' > "${f}"
+              printf 'kind: Template\napiVersion: v1\nobjects:\n- ' > "${f}"
             done
 
             kubectl create configmap model-access-permissions \
@@ -69,8 +66,7 @@ jobs:
               --dry-run=client --validate=false -o yaml | indent >> "${ROLE_CONFIGMAP_FILE}"
 
             for f in "${PERMISSION_CONFIGMAP_FILE}" "${ROLE_CONFIGMAP_FILE}"; do
-              echo ' annotations:
-            qontract.recycle: "true"' >> "${f}"
+              printf '%s\n' ' annotations:' ' qontract.recycle: "true"' >> "${f}"
             done
           done
 
@@ -88,18 +84,25 @@ jobs:
         with:
           validationfile: "configs/prod/schemas/schema.zed"
 
-      # ghcommit uses createCommitOnBranch, which requires the branch to already exist.
-      # convert-config used to delete configmaps-schema before push; it may be missing.
-      - name: Ensure configmaps-schema branch exists
+      # ghcommit requires the branch to exist and expectedHeadOid must match its tip.
+      # Reset to master each run (old convert-config deleted/recreated the branch).
+      - name: Reset configmaps-schema branch to master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ! git ls-remote --exit-code --heads origin configmaps-schema >/dev/null 2>&1; then
-            MASTER_SHA=$(gh api "repos/${{ github.repository }}/git/ref/heads/master" --jq .object.sha)
+          set -euo pipefail
+          MASTER_SHA=$(gh api "repos/${{ github.repository }}/git/ref/heads/master" --jq .object.sha)
+          if gh api "repos/${{ github.repository }}/git/ref/heads/configmaps-schema" >/dev/null 2>&1; then
+            gh api -X PATCH "repos/${{ github.repository }}/git/refs/heads/configmaps-schema" \
+              -f sha="${MASTER_SHA}" \
+              -F force=true
+          else
             gh api "repos/${{ github.repository }}/git/refs" \
               -f ref='refs/heads/configmaps-schema' \
               -f sha="${MASTER_SHA}"
           fi
+          git fetch origin master configmaps-schema
+          echo "configmaps-schema reset to master (${MASTER_SHA})"
 
       # GitHub API commits are verified; plain git push from convert-config is not.
       - name: Push signed commit to configmaps-schema
@@ -118,6 +121,11 @@ jobs:
           set -euo pipefail
           git fetch origin master configmaps-schema
 
+          if ! git rev-parse --verify origin/configmaps-schema >/dev/null 2>&1; then
+            echo "origin/configmaps-schema not found after fetch"
+            exit 1
+          fi
+
           AHEAD=$(git rev-list --count origin/master..origin/configmaps-schema)
           if [ "${AHEAD}" -eq 0 ]; then
             echo "No commits on configmaps-schema ahead of master; skipping PR"
@@ -131,8 +139,12 @@ jobs:
             exit 0
           fi
 
+          # Do not use --fill-first: ghcommit updates the branch via API and local
+          # refs are often missing for gh's internal "origin/master...branch" lookup.
+          BODY=$(git log -1 --format='%B' origin/configmaps-schema)
+
           gh pr create \
             --base master \
             --head configmaps-schema \
             --title "[GitHub] - Automated ConfigMap & Schema Generation" \
-            --fill-first
+            --body "${BODY}"
