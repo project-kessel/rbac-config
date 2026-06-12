@@ -6,7 +6,7 @@ There is no application code here -- only JSON configs, KSL schemas, and CI auto
 
 | Resource | Link |
 |----------|------|
-| RBAC Service | https://github.com/RedHatInsights/insights-rbac |
+| RBAC Service | https://github.com/project-kessel/insights-rbac |
 | RBAC Platform Docs | https://consoledot.pages.redhat.com/docs/dev/services/rbac.html |
 
 ## Deployment Schedule

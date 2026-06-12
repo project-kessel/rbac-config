@@ -31,12 +31,12 @@ jobs:
 
       # generate ksil json file
       - name: Run Generate V1-Only Permissions Data for stage
-        uses: RedHatInsights/rbac-config-actions/generate-v1-only-permissions@main
+        uses: project-kessel/rbac-config-actions/generate-v1-only-permissions@main
         with:
           ksl: configs/stage/schemas
           rbac_permissions: configs/stage/permissions
       - name: Run Generate V1-Only Permissions Data for prod
-        uses: RedHatInsights/rbac-config-actions/generate-v1-only-permissions@main
+        uses: project-kessel/rbac-config-actions/generate-v1-only-permissions@main
         with:
           ksl: configs/prod/schemas
           rbac_permissions: configs/prod/permissions
