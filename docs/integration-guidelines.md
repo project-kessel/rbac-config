@@ -23,7 +23,7 @@ This repository defines RBAC (Role-Based Access Control) permissions and roles f
 2. The **PR workflow** (`.github/workflows/pr.yml`) validates JSON schemas and SpiceDB schemas
 3. After merge to `master`, the **master workflow** (`.github/workflows/master.yml`) automatically:
    - Generates V1-only permissions data from KSL schemas
-   - Converts configs into Kubernetes ConfigMap templates via `RedHatInsights/rbac-config-actions/convert-config`
+   - Converts configs into Kubernetes ConfigMap templates via `project-kessel/rbac-config-actions/convert-config`
    - Validates generated SpiceDB schemas with `authzed/action-spicedb-validate`
    - Creates an automated PR on the `configmaps-schema` branch with the title `[GitHub] - Automated ConfigMap & Schema Generation`
 4. Once the ConfigMap PR is merged, a separate MR must be created in the **app-interface** GitLab repo to bump the `ref` in the `resourceTemplate` for the target namespace, which triggers actual deployment
@@ -124,16 +124,16 @@ Stage may include additional KSL files not yet in prod (e.g., `subscriptions.ksl
 
 Runs on every PR to `master` with these sequential checks:
 1. **JSON Schema validation** via `walbo/validate-json` -- validates all `configs/*/permissions/*.json` against `schemas/permissions.schema` and all `configs/*/roles/*.json` against `schemas/roles.schema` (roles use `strict: false`)
-2. **Permission dependency validation** via `RedHatInsights/rbac-config-actions/validate-permission-dependencies` -- checks `requires` field integrity
-3. **V1-only permissions generation** via `RedHatInsights/rbac-config-actions/generate-v1-only-permissions` -- for both stage and prod
-4. **Schema generation and validation** via `RedHatInsights/rbac-config-actions/validate-schema`
+2. **Permission dependency validation** via `project-kessel/rbac-config-actions/validate-permission-dependencies` -- checks `requires` field integrity
+3. **V1-only permissions generation** via `project-kessel/rbac-config-actions/generate-v1-only-permissions` -- for both stage and prod
+4. **Schema generation and validation** via `project-kessel/rbac-config-actions/validate-schema`
 5. **SpiceDB schema validation** via `authzed/action-spicedb-validate` -- validates the generated `.zed` files for both environments
 
 ### Master Merge Pipeline (`.github/workflows/master.yml`)
 
 Runs on push to `master`:
 1. Generates V1-only permissions for both environments
-2. Converts configs to ConfigMaps and generates schemas via `RedHatInsights/rbac-config-actions/convert-config` (pushes to `configmaps-schema` branch)
+2. Converts configs to ConfigMaps and generates schemas via `project-kessel/rbac-config-actions/convert-config` (pushes to `configmaps-schema` branch)
 3. Validates generated SpiceDB schemas
 4. Creates a PR from `configmaps-schema` to `master` using `gh pr create` if changes exist
 
@@ -141,10 +141,10 @@ Runs on push to `master`:
 
 | Action | Purpose |
 |--------|---------|
-| `RedHatInsights/rbac-config-actions/validate-permission-dependencies@main` | Validates `requires` field references |
-| `RedHatInsights/rbac-config-actions/generate-v1-only-permissions@main` | Generates V1 compatibility data from KSL |
-| `RedHatInsights/rbac-config-actions/validate-schema@main` | Generates and validates KSL schemas |
-| `RedHatInsights/rbac-config-actions/convert-config@main` | Converts JSON configs to K8s ConfigMaps |
+| `project-kessel/rbac-config-actions/validate-permission-dependencies@main` | Validates `requires` field references |
+| `project-kessel/rbac-config-actions/generate-v1-only-permissions@main` | Generates V1 compatibility data from KSL |
+| `project-kessel/rbac-config-actions/validate-schema@main` | Generates and validates KSL schemas |
+| `project-kessel/rbac-config-actions/convert-config@main` | Converts JSON configs to K8s ConfigMaps |
 | `authzed/action-spicedb-validate@v1` | Validates SpiceDB `.zed` schema files |
 | `walbo/validate-json@v1.1.0` | Validates JSON against JSON Schema |
 

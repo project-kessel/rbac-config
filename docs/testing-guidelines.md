@@ -27,14 +27,14 @@ All files matching `configs/*/roles/*.json` are validated against `schemas/roles
 
 ### 3. Permission Dependency Validation
 
-Uses `RedHatInsights/rbac-config-actions/validate-permission-dependencies` against `configs/*/permissions/*.json`. This validates that any `requires` array entries reference verbs that actually exist for the same app/resource combination. For example, if `create` requires `["read"]`, then `read` must be defined in the same resource array.
+Uses `project-kessel/rbac-config-actions/validate-permission-dependencies` against `configs/*/permissions/*.json`. This validates that any `requires` array entries reference verbs that actually exist for the same app/resource combination. For example, if `create` requires `["read"]`, then `read` must be defined in the same resource array.
 
 ### 4. KSL-to-SpiceDB Schema Generation
 
 The pipeline generates V1-only permissions data and then compiles KSL schemas for both environments:
 
 - **V1 permissions generation**: Reads `configs/{stage,prod}/permissions/*.json` and `configs/{stage,prod}/schemas/*.lst` files to produce `configs/{stage,prod}/schemas/src/rbac_v1_permissions.json` (gitignored build artifact)
-- **Schema compilation**: Uses `RedHatInsights/rbac-config-actions/validate-schema` to compile `.ksl` source files plus the generated JSON into `configs/{stage,prod}/schemas/schema.zed`
+- **Schema compilation**: Uses `project-kessel/rbac-config-actions/validate-schema` to compile `.ksl` source files plus the generated JSON into `configs/{stage,prod}/schemas/schema.zed`
 
 The `.lst` files (`migrated_apps.lst`, `hostsonly_apps.lst`) control which apps get V1-only permission entries in the generated schema.
 

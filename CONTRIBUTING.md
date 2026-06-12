@@ -12,12 +12,12 @@ This project follows the [Red Hat Code of Conduct](https://www.redhat.com/en/abo
 
 - **Go 1.22+** ([download](https://golang.org/dl/))
 - **Git** for version control
-- **GitHub account** with access to RedHatInsights
+- **GitHub account** with access to project-kessel
 
 ### Local Setup
 
 ```sh
-git clone https://github.com/RedHatInsights/rbac-config.git
+git clone https://github.com/project-kessel/rbac-config.git
 cd rbac-config
 make init                    # Install ksl and generate-v1-only-permissions tools
 make check-go-tools          # Verify installation
@@ -118,6 +118,6 @@ Detailed guidance is available in dedicated files:
 
 - **Technical questions:** Open a GitHub issue
 - **RBAC service questions:** Consult the [RBAC Platform Docs](https://consoledot.pages.redhat.com/docs/dev/services/rbac.html)
-- **Service repository:** [insights-rbac](https://github.com/RedHatInsights/insights-rbac)
+- **Service repository:** [insights-rbac](https://github.com/project-kessel/insights-rbac)
 
 Thank you for contributing!
