@@ -28,5 +28,16 @@
         {
             "verb": "*"
         }
+    ],
+    "views": [
+        {
+            "verb": "read"
+        },
+        {
+            "verb": "write"
+        },
+        {
+            "verb": "*"
+        }
     ]
 }
