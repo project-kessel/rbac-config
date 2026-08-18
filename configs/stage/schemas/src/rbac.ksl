@@ -58,20 +58,23 @@ public type workspace { //Workspace is public so services can place resources in
     // Explicitly defined on root workspaces, otherwise inherited from the parent workspace.
     relation tenant: [AtMostOne tenant] or parent.tenant
 
-    @add_v1_based_permission(app:'inventory', resource:'groups', verb:'read', v2_perm:'rbac_workspace_view')
-    relation view: rbac_workspace_view
+    @add_unified_permission(app:'inventory', resource:'groups', verb:'read')
+    @add_unified_permission(app:'inventory', resource:'groups', verb:'write')
 
-    @add_v1_based_permission(app:'inventory', resource:'groups', verb:'write', v2_perm:'rbac_workspace_create')
-    relation create: rbac_workspace_create
+    @add_unified_permission(app:'rbac', resource:'workspace', verb:'view')
+    relation view: inventory_groups_read or rbac_workspace_view
 
-    @add_v1_based_permission(app:'inventory', resource:'groups', verb:'write', v2_perm:'rbac_workspace_edit')
-    relation edit: rbac_workspace_edit
+    @add_unified_permission(app:'rbac', resource:'workspace', verb:'create')
+    relation create: inventory_groups_write or rbac_workspace_create
 
-    @add_v1_based_permission(app:'inventory', resource:'groups', verb:'write', v2_perm:'rbac_workspace_delete')
-    relation delete: rbac_workspace_delete
+    @add_unified_permission(app:'rbac', resource:'workspace', verb:'edit')
+    relation edit: inventory_groups_write or rbac_workspace_edit
 
-    @add_v1_based_permission(app:'inventory', resource:'groups', verb:'write', v2_perm:'rbac_workspace_move')
-    relation move: rbac_workspace_move
+    @add_unified_permission(app:'rbac', resource:'workspace', verb:'delete')
+    relation delete: inventory_groups_write or rbac_workspace_delete
+
+    @add_unified_permission(app:'rbac', resource:'workspace', verb:'move')
+    relation move: inventory_groups_write or rbac_workspace_move
 
     @add_unified_permission(app:'rbac', resource:'role_binding', verb:'view')
     relation role_binding_view: rbac_role_binding_view
@@ -81,6 +84,9 @@ public type workspace { //Workspace is public so services can place resources in
 
     @add_unified_permission(app:'rbac', resource:'role_binding', verb:'revoke')
     relation role_binding_revoke: rbac_role_binding_revoke
+
+    @add_v1_based_permission(app:'rbac', resource:'audit_logs', verb:'read', v2_perm:'rbac_audit_log_view')
+    relation audit_log_view: rbac_audit_log_view
 }
 
 // Adds a permission that's checkable at the workspace but granted by assigning a different, V1 permission to the role
