@@ -1,0 +1,128 @@
+name: Schema Sync
+
+on:
+  schedule:
+    # Daily at 14:00 UTC
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to sync (default: latest). Format: vYYYYMMDD.N (e.g. v20260804.3)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: schema-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Sync schema release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SCHEMA_REPO: lennysgarage/starlark-unified-schema
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Persist credentials so we can push the sync branch
+          persist-credentials: true
+
+      - name: Resolve target release tag
+        id: resolve
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          CURRENT=$(grep -E '^SCHEMA_VERSION=' Makefile | head -1 | cut -d= -f2-)
+          echo "current=${CURRENT}" >> "${GITHUB_OUTPUT}"
+          echo "Current SCHEMA_VERSION: ${CURRENT}"
+
+          if [ -n "${INPUT_TAG}" ]; then
+            TARGET="${INPUT_TAG}"
+          else
+            if ! TARGET=$(gh release view --repo "${SCHEMA_REPO}" --json tagName -q .tagName 2>/dev/null); then
+              echo "No releases found on ${SCHEMA_REPO}; nothing to sync."
+              echo "skip=true" >> "${GITHUB_OUTPUT}"
+              exit 0
+            fi
+          fi
+
+          TAG_RE='^v[0-9]{8}\.[0-9]+$'
+          if [[ ! "${TARGET}" =~ $TAG_RE ]]; then
+            echo "Invalid schema release tag: ${TARGET}"
+            echo "Expected format: vYYYYMMDD.N (e.g. v20260804.3)"
+            exit 1
+          fi
+
+          echo "target=${TARGET}" >> "${GITHUB_OUTPUT}"
+          echo "Target release tag: ${TARGET}"
+
+          # Scheduled / latest runs no-op when already pinned. A manual tag
+          # input always proceeds (rollback or forced re-sync).
+          if [ -z "${INPUT_TAG}" ] && [ "${CURRENT}" = "${TARGET}" ]; then
+            echo "Already at ${TARGET}; no-op."
+            echo "skip=true" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          echo "skip=false" >> "${GITHUB_OUTPUT}"
+
+      - name: Sync schemas and open PR
+        if: steps.resolve.outputs.skip != 'true'
+        env:
+          TARGET: ${{ steps.resolve.outputs.target }}
+        run: |
+          set -euo pipefail
+          BRANCH="schema-sync/${TARGET}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin master
+          git checkout -B "${BRANCH}" origin/master
+
+          # Pin SCHEMA_VERSION to the target release
+          awk -v ver="${TARGET}" '
+            /^SCHEMA_VERSION=/ { print "SCHEMA_VERSION=" ver; next }
+            { print }
+          ' Makefile > Makefile.tmp && mv Makefile.tmp Makefile
+
+          make update-schemas SCHEMA_VERSION="${TARGET}" SCHEMA_REPO="${SCHEMA_REPO}"
+
+          git add Makefile configs/stage/schemas/src/*.json configs/prod/schemas/src/*.json
+
+          if git diff --cached --quiet; then
+            echo "No file changes after sync; skipping commit/PR."
+            exit 0
+          fi
+
+          git commit -m "chore: sync schemas from ${SCHEMA_REPO}@${TARGET}"
+          git push -u origin HEAD --force
+
+          PR_BODY=$(cat <<EOF
+          ## Summary
+
+          Automated schema sync from [\`${SCHEMA_REPO}\`](https://github.com/${SCHEMA_REPO}) release \`${TARGET}\`.
+
+          - Bumps \`SCHEMA_VERSION\` to \`${TARGET}\`
+          - Runs \`make update-schemas\` (downloads \`ksl.tar.gz\`, extracts KSIL JSON into stage and prod \`schemas/src/\`)
+
+          ## Test plan
+
+          - [ ] \`pr.yml\` validation passes
+          - [ ] Diff reviewed: KSIL JSON updated in stage and prod; hand-authored \`.ksl\` files preserved
+          - [ ] Rollback: re-run Schema Sync workflow with an older \`tag\` if needed
+          EOF
+          )
+          gh pr view "${BRANCH}" >/dev/null 2>&1 || gh pr create \
+            --base master \
+            --head "${BRANCH}" \
+            --title "chore: sync schemas to ${TARGET}" \
+            --body "${PR_BODY}"

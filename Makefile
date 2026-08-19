@@ -5,7 +5,10 @@ endif
 
 GOBIN := $(shell go env GOPATH)/bin
 
-.PHONY: init check-go-tools ksl-schema-stage ksl-test-schema-stage ksl-schema-prod ksl-test-schema-prod
+SCHEMA_REPO ?= project-kessel/starlark-unified-schema
+SCHEMA_VERSION=unset
+
+.PHONY: init check-go-tools ksl-schema-stage ksl-test-schema-stage ksl-schema-prod ksl-test-schema-prod update-schemas
 
 init:
 	@HASH=$$(git ls-remote https://github.com/project-kessel/ksl-schema-language.git HEAD | cut -f1) && \
@@ -52,3 +55,16 @@ ksl-schema-prod: configs/prod/schemas/schema.zed
 ksl-test-schema-prod: configs/prod/schemas/src/*.ksl configs/prod/schemas/src/rbac_v1_permissions.json
 	@mkdir -p _private/test-schema
 	$(GOBIN)/ksl -o _private/test-schema/prod-schema.zed configs/prod/schemas/src/*.ksl configs/prod/schemas/src/*.json
+
+# Download starlark KSIL release and overlay JSON into stage and prod (additive;
+# does not delete). Tarball is features.json only, so hand-authored .ksl files
+# are not overwritten. Does not compile KSL or regenerate schema.zed.
+update-schemas:
+	@test -n "$(SCHEMA_VERSION)" || { echo "SCHEMA_VERSION is required"; exit 1; }
+	gh release download "$(SCHEMA_VERSION)" \
+		--repo "$(SCHEMA_REPO)" \
+		--pattern 'ksl.tar.gz' \
+		--clobber
+	tar xzf ksl.tar.gz -C configs/stage/schemas/src
+	tar xzf ksl.tar.gz -C configs/prod/schemas/src
+	rm -f ksl.tar.gz
