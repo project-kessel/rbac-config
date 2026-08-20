@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      SCHEMA_REPO: lennysgarage/starlark-unified-schema
+      SCHEMA_REPO: project-kessel/starlark-unified-schema
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
@@ -40,9 +40,9 @@ jobs:
           INPUT_TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
-          CURRENT=$(grep -E '^SCHEMA_VERSION=' Makefile | head -1 | cut -d= -f2-)
+          CURRENT=$(grep -E '^KSIL_SCHEMA_VERSION=' Makefile | head -1 | cut -d= -f2-)
           echo "current=${CURRENT}" >> "${GITHUB_OUTPUT}"
-          echo "Current SCHEMA_VERSION: ${CURRENT}"
+          echo "Current KSIL_SCHEMA_VERSION: ${CURRENT}"
 
           if [ -n "${INPUT_TAG}" ]; then
             TARGET="${INPUT_TAG}"
@@ -88,13 +88,13 @@ jobs:
           git fetch origin master
           git checkout -B "${BRANCH}" origin/master
 
-          # Pin SCHEMA_VERSION to the target release
+          # Pin KSIL_SCHEMA_VERSION to the target release
           awk -v ver="${TARGET}" '
-            /^SCHEMA_VERSION=/ { print "SCHEMA_VERSION=" ver; next }
+            /^KSIL_SCHEMA_VERSION=/ { print "KSIL_SCHEMA_VERSION=" ver; next }
             { print }
           ' Makefile > Makefile.tmp && mv Makefile.tmp Makefile
 
-          make update-schemas SCHEMA_VERSION="${TARGET}" SCHEMA_REPO="${SCHEMA_REPO}"
+          make update-schemas KSIL_SCHEMA_VERSION="${TARGET}" SCHEMA_REPO="${SCHEMA_REPO}"
 
           git add Makefile configs/stage/schemas/src/*.json configs/prod/schemas/src/*.json
 
@@ -111,7 +111,7 @@ jobs:
 
           Automated schema sync from [\`${SCHEMA_REPO}\`](https://github.com/${SCHEMA_REPO}) release \`${TARGET}\`.
 
-          - Bumps \`SCHEMA_VERSION\` to \`${TARGET}\`
+          - Bumps \`KSIL_SCHEMA_VERSION\` to \`${TARGET}\`
           - Runs \`make update-schemas\` (downloads \`ksl.tar.gz\`, extracts KSIL JSON into stage and prod \`schemas/src/\`)
 
           ## Test plan

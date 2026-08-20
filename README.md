@@ -71,7 +71,7 @@ make init                    # Install ksl and generate-v1-only-permissions tool
 make check-go-tools          # Verify the tools are installed
 make ksl-test-schema-stage   # Build and validate stage schema
 make ksl-test-schema-prod    # Build and validate prod schema
-make update-schemas SCHEMA_VERSION=vYYYYMMDD.N   # Overlay KSIL JSON into stage and prod
+make update-schemas KSIL_SCHEMA_VERSION=vYYYYMMDD.N   # Overlay KSIL JSON into stage and prod
 ```
 
 Test schemas are written to `_private/test-schema/stage-schema.zed` and `_private/test-schema/prod-schema.zed`.
