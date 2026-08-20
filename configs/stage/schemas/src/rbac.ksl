@@ -61,13 +61,13 @@ public type workspace { //Workspace is public so services can place resources in
     @add_v1_based_permission(app:'inventory', resource:'groups', verb:'read', v2_perm:'inventory_group_view')
     @add_v1_based_permission(app:'inventory', resource:'groups', verb:'write', v2_perm:'inventory_group_edit')
 
-    @add_unified_permission(app:'rbac', resource:'workspace', verb:'view')
+    @add_v1_based_permission(app:'rbac', resource:'workspace', verb:'read', v2_perm:'rbac_workspace_view')
     relation view: inventory_group_view or rbac_workspace_view
 
     @add_unified_permission(app:'rbac', resource:'workspace', verb:'create')
     relation create: inventory_group_edit or rbac_workspace_create
 
-    @add_unified_permission(app:'rbac', resource:'workspace', verb:'edit')
+    @add_v1_based_permission(app:'rbac', resource:'workspace', verb:'write', v2_perm:'rbac_workspace_edit')
     relation edit: inventory_group_edit or rbac_workspace_edit
 
     @add_unified_permission(app:'rbac', resource:'workspace', verb:'delete')
