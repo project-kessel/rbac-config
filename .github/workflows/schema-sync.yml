@@ -121,8 +121,10 @@ jobs:
           - [ ] Rollback: re-run Schema Sync workflow with an older \`tag\` if needed
           EOF
           )
-          gh pr view "${BRANCH}" >/dev/null 2>&1 || gh pr create \
-            --base master \
-            --head "${BRANCH}" \
-            --title "chore: sync schemas to ${TARGET}" \
-            --body "${PR_BODY}"
+          if [ -z "$(gh pr list --head "${BRANCH}" --state open --json number -q '.[0].number')" ]; then
+            gh pr create \
+              --base master \
+              --head "${BRANCH}" \
+              --title "chore: sync schemas to ${TARGET}" \
+              --body "${PR_BODY}"
+          fi
