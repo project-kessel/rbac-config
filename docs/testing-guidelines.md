@@ -63,13 +63,12 @@ make ksl-test-schema-prod    # writes _private/test-schema/prod-schema.zed
 
 ### Updating KSIL from starlark-unified-schema
 
-`make update-schemas` downloads `ksl.tar.gz` for `KSIL_SCHEMA_VERSION` from `SCHEMA_REPO` (default `project-kessel/starlark-unified-schema`) and overlays `*.json` into both `configs/stage/schemas/src/` and `configs/prod/schemas/src/`. It does not compile KSL. Requires the `gh` CLI.
+`make update-schemas` downloads `ksl.tar.gz` for `KSIL_SCHEMA_VERSION` from `SCHEMA_REPO` (default `project-kessel/starlark-unified-schema`) and overlays `*.json` into `configs/stage/schemas/src/` only. It does not compile KSL or touch prod. Requires the `gh` CLI.
 
 ```sh
 make update-schemas KSIL_SCHEMA_VERSION=vYYYYMMDD.N
 make update-schemas KSIL_SCHEMA_VERSION=vYYYYMMDD.N SCHEMA_REPO=owner/repo   # fork override
 make ksl-test-schema-stage
-make ksl-test-schema-prod
 ```
 
 The current pin is the `KSIL_SCHEMA_VERSION=` line in the Makefile (`unset` until the first sync). Automated sync is `.github/workflows/schema-sync.yml`.

@@ -96,7 +96,7 @@ jobs:
 
           make update-schemas KSIL_SCHEMA_VERSION="${TARGET}" SCHEMA_REPO="${SCHEMA_REPO}"
 
-          git add Makefile configs/stage/schemas/src/*.json configs/prod/schemas/src/*.json
+          git add Makefile configs/stage/schemas/src/*.json
 
           if git diff --cached --quiet; then
             echo "No file changes after sync; skipping commit/PR."
@@ -112,12 +112,12 @@ jobs:
           Automated schema sync from [\`${SCHEMA_REPO}\`](https://github.com/${SCHEMA_REPO}) release \`${TARGET}\`.
 
           - Bumps \`KSIL_SCHEMA_VERSION\` to \`${TARGET}\`
-          - Runs \`make update-schemas\` (downloads \`ksl.tar.gz\`, extracts KSIL JSON into stage and prod \`schemas/src/\`)
+          - Runs \`make update-schemas\` (downloads \`ksl.tar.gz\`, extracts KSIL JSON into stage \`schemas/src/\`)
 
           ## Test plan
 
           - [ ] \`pr.yml\` validation passes
-          - [ ] Diff reviewed: KSIL JSON updated in stage and prod; hand-authored \`.ksl\` files preserved
+          - [ ] Diff reviewed: KSIL JSON updated in stage; hand-authored \`.ksl\` files preserved; prod JSON unchanged
           - [ ] Rollback: re-run Schema Sync workflow with an older \`tag\` if needed
           EOF
           )
