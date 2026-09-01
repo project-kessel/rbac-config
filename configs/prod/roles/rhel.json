@@ -79,9 +79,6 @@
           ]
         },
         {
-          "permission": "policies:policies:read"
-        },
-        {
           "permission": "remediations:remediation:read"
         },
         {
@@ -98,7 +95,7 @@
     {
       "name": "RHEL operator",
       "display_name": "RHEL operator",
-      "description": "Grants edit access to system configs, inventory, policies, and notifications/integrations. View compliance reports, patch info, malware detections, and recommendations. Initiate remediations, manage staleness data and modify vulnerability settings.",
+      "description": "Grants edit access to system configs, inventory, and notifications/integrations. View compliance reports, patch info, malware detections, and recommendations. Initiate remediations, manage staleness data and modify vulnerability settings.",
       "system": true,
       "platform_default": false,
       "admin_default": false,
@@ -187,12 +184,6 @@
               }
             }
           ]
-        },
-        {
-          "permission": "policies:policies:read"
-        },
-        {
-          "permission": "policies:policies:write"
         },
         {
           "permission": "remediations:*:read"
@@ -330,12 +321,6 @@
               }
             }
           ]
-        },
-        {
-          "permission": "policies:policies:read"
-        },
-        {
-          "permission": "policies:policies:write"
         },
         {
           "permission": "remediations:*:*"
