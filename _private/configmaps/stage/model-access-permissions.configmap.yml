@@ -341,6 +341,17 @@ objects:
               {
                   "verb": "*"
               }
+          ],
+          "views": [
+              {
+                  "verb": "read"
+              },
+              {
+                  "verb": "write"
+              },
+              {
+                  "verb": "*"
+              }
           ]
       }
     malware-detection.json: |
