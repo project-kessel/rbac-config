@@ -62,6 +62,7 @@ _private/                   # Generated artifacts -- never edit
 ### Prerequisites
 
 - Go 1.22+ ([download](https://golang.org/dl/))
+- `gh` CLI (only needed for `make update-schemas`)
 
 ### Setup and build
 
@@ -70,6 +71,7 @@ make init                    # Install ksl and generate-v1-only-permissions tool
 make check-go-tools          # Verify the tools are installed
 make ksl-test-schema-stage   # Build and validate stage schema
 make ksl-test-schema-prod    # Build and validate prod schema
+make update-schemas KSIL_SCHEMA_VERSION=vYYYYMMDD.N   # Overlay KSIL JSON into stage only
 ```
 
 Test schemas are written to `_private/test-schema/stage-schema.zed` and `_private/test-schema/prod-schema.zed`.

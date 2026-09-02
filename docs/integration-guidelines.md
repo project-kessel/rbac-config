@@ -137,6 +137,10 @@ Runs on push to `master`:
 3. Validates generated SpiceDB schemas
 4. Creates a PR from `configmaps-schema` to `master` using `gh pr create` if changes exist
 
+### Schema Sync Pipeline (`.github/workflows/schema-sync.yml`)
+
+Detects new [starlark-unified-schema](https://github.com/project-kessel/starlark-unified-schema) GitHub Releases and opens a PR that pins `KSIL_SCHEMA_VERSION` and overlays KSIL JSON into `configs/stage/schemas/src/` only. Runs daily and via `workflow_dispatch` (optional `tag` input for a specific release or rollback). Uses `make update-schemas`. Does not regenerate `schema.zed` — that remains the master workflow's job after merge. Prod KSIL is a later copy of named JSON (e.g. `features.json`) when an SP is ready; live clusters still follow Tuesday/Thursday app-interface `ref` bumps.
+
 ### External Actions Used
 
 | Action | Purpose |
@@ -160,6 +164,15 @@ The `integrations` and `notifications` applications are tightly coupled but sepa
 ## Local Development with Makefile
 
 Run `make init` to install Go-based tools (`ksl` and `generate-v1-only-permissions`). Use `make ksl-test-schema-stage` or `make ksl-test-schema-prod` to build test schemas locally before pushing. The generated `rbac_v1_permissions.json` files are gitignored.
+
+To pull a starlark-unified-schema KSIL release into stage (requires the `gh` CLI):
+
+```sh
+make update-schemas KSIL_SCHEMA_VERSION=vYYYYMMDD.N
+# Optional: SCHEMA_REPO=owner/repo to download from a fork
+```
+
+This overlays `*.json` into `configs/stage/schemas/src/` without modifying `.ksl` files or `configs/prod`. Copy named JSON (e.g. `features.json`) to prod in a separate PR when soak/purge is ready. After the schema-sync PR is merged, `master.yml` regenerates `schema.zed`; clusters go live on the existing Tuesday/Thursday deploy cadence.
 
 ## Environment Consistency Rules
 

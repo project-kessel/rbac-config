@@ -1,5 +1,6 @@
 # Schema build artifacts
 **/rbac_v1_permissions.json
+ksl.tar.gz
 
 # Local test outputs
 _private/test-schema/
