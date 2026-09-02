@@ -71,7 +71,7 @@ make update-schemas KSIL_SCHEMA_VERSION=vYYYYMMDD.N SCHEMA_REPO=owner/repo   # f
 make ksl-test-schema-stage
 ```
 
-The current pin is the `KSIL_SCHEMA_VERSION=` line in the Makefile (`unset` until the first sync). Automated sync is `.github/workflows/schema-sync.yml`.
+The current pin is the `KSIL_SCHEMA_VERSION=` line in the Makefile (empty until the first sync). Automated sync is `.github/workflows/schema-sync.yml`.
 
 ### Build Dependency Chain
 
