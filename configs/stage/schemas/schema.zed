@@ -66,6 +66,8 @@ definition rbac/platform {
 	permission inventory_host_move = t_binding->inventory_host_move
 	permission inventory_host_update = t_binding->inventory_host_update
 	permission inventory_host_view = t_binding->inventory_host_view
+	permission inventory_view_update = t_binding->inventory_view_update
+	permission inventory_view_view = t_binding->inventory_view_view
 	permission malware_malware_acknowledge = (inventory_host_view & malware_malware_acknowledge_assigned)
 	permission malware_malware_acknowledge_assigned = t_binding->malware_malware_acknowledge_assigned
 	permission malware_malware_edit = (inventory_host_view & malware_malware_edit_assigned)
@@ -395,6 +397,14 @@ definition rbac/role {
 	relation t_inventory_hosts_read: rbac/principal:*
 	permission inventory_hosts_write = t_inventory_hosts_write
 	relation t_inventory_hosts_write: rbac/principal:*
+	permission inventory_view_update = inventory_views_write + inventory_views_all + inventory_all_write + inventory_all_all + all_all_all + t_child->inventory_view_update
+	permission inventory_view_view = inventory_views_read + inventory_views_all + inventory_all_read + inventory_all_all + all_all_all + t_child->inventory_view_view
+	permission inventory_views_all = t_inventory_views_all
+	relation t_inventory_views_all: rbac/principal:*
+	permission inventory_views_read = t_inventory_views_read
+	relation t_inventory_views_read: rbac/principal:*
+	permission inventory_views_write = t_inventory_views_write
+	relation t_inventory_views_write: rbac/principal:*
 	permission malware_detection_acknowledgements_all = t_malware_detection_acknowledgements_all
 	relation t_malware_detection_acknowledgements_all: rbac/principal:*
 	permission malware_detection_acknowledgements_write = t_malware_detection_acknowledgements_write
@@ -722,6 +732,8 @@ definition rbac/role_binding {
 	permission inventory_host_move = (subject & t_role->inventory_host_move)
 	permission inventory_host_update = (subject & t_role->inventory_host_update)
 	permission inventory_host_view = (subject & t_role->inventory_host_view)
+	permission inventory_view_update = (subject & t_role->inventory_view_update)
+	permission inventory_view_view = (subject & t_role->inventory_view_view)
 	permission malware_malware_acknowledge_assigned = (subject & t_role->malware_malware_acknowledge_assigned)
 	permission malware_malware_edit_assigned = (subject & t_role->malware_malware_edit_assigned)
 	permission malware_malware_view_assigned = (subject & t_role->malware_malware_view_assigned)
@@ -818,6 +830,8 @@ definition rbac/tenant {
 	permission inventory_host_move = t_binding->inventory_host_move + t_platform->inventory_host_move
 	permission inventory_host_update = t_binding->inventory_host_update + t_platform->inventory_host_update
 	permission inventory_host_view = t_binding->inventory_host_view + t_platform->inventory_host_view
+	permission inventory_view_update = t_binding->inventory_view_update + t_platform->inventory_view_update
+	permission inventory_view_view = t_binding->inventory_view_view + t_platform->inventory_view_view
 	permission malware_malware_acknowledge = (inventory_host_view & malware_malware_acknowledge_assigned)
 	permission malware_malware_acknowledge_assigned = t_binding->malware_malware_acknowledge_assigned + t_platform->malware_malware_acknowledge_assigned
 	permission malware_malware_edit = (inventory_host_view & malware_malware_edit_assigned)
@@ -931,6 +945,8 @@ definition rbac/workspace {
 	permission inventory_host_move = t_binding->inventory_host_move + t_parent->inventory_host_move
 	permission inventory_host_update = t_binding->inventory_host_update + t_parent->inventory_host_update
 	permission inventory_host_view = t_binding->inventory_host_view + t_parent->inventory_host_view
+	permission inventory_view_update = t_binding->inventory_view_update + t_parent->inventory_view_update
+	permission inventory_view_view = t_binding->inventory_view_view + t_parent->inventory_view_view
 	permission malware_malware_acknowledge = (inventory_host_view & malware_malware_acknowledge_assigned)
 	permission malware_malware_acknowledge_assigned = t_binding->malware_malware_acknowledge_assigned + t_parent->malware_malware_acknowledge_assigned
 	permission malware_malware_edit = (inventory_host_view & malware_malware_edit_assigned)
