@@ -8,6 +8,7 @@ import rbac
 
 public type host {
     private relation workspace: [ExactlyOne rbac.workspace]
+    relation tenant: workspace.tenant
     
     @rbac.add_v1_based_permission(app:'inventory', resource:'hosts', verb:'read', v2_perm:'inventory_host_view')
     relation view: workspace.inventory_host_view
