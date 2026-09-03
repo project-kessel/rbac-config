@@ -8,6 +8,7 @@ definition hbi/host {
 	permission patch_template_edit = (view & t_workspace->patch_template_edit)
 	permission patch_template_view = (view & t_workspace->patch_template_view)
 	permission ros_read_analysis = (view & t_workspace->ros_read_analysis)
+	permission tenant = t_workspace->tenant
 	permission update = t_workspace->inventory_host_update
 	permission view = t_workspace->inventory_host_view
 	permission workspace = t_workspace
