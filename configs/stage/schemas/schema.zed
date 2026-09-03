@@ -1,3 +1,10 @@
+definition features/billing_account {
+	permission services = t_services
+	relation t_services: features/service
+}
+
+definition features/service {}
+
 definition hbi/host {
 	permission advisor_recommendation_results_edit = (view & t_workspace->advisor_recommendation_results_edit)
 	permission advisor_recommendation_results_view = (view & t_workspace->advisor_recommendation_results_view)
@@ -939,6 +946,13 @@ definition rbac/workspace {
 	permission create = rbac_workspace_create
 	permission delete = rbac_workspace_delete
 	permission edit = rbac_workspace_edit
+	permission features_workspace__desired_services = features_workspace_direct_service_preferences + t_parent->features_workspace__desired_services
+	permission features_workspace__paid_services = t_features_workspace_direct_billing_account->services + t_parent->features_workspace__paid_services
+	permission features_workspace_direct_billing_account = t_features_workspace_direct_billing_account
+	relation t_features_workspace_direct_billing_account: features/billing_account
+	permission features_workspace_direct_service_preferences = t_features_workspace_direct_service_preferences
+	relation t_features_workspace_direct_service_preferences: features/service
+	permission features_workspace_enabled_services = (features_workspace__paid_services & features_workspace__desired_services)
 	permission integrations_endpoints_edit = t_binding->integrations_endpoints_edit + t_parent->integrations_endpoints_edit
 	permission integrations_endpoints_view = t_binding->integrations_endpoints_view + t_parent->integrations_endpoints_view
 	permission inventory_host_delete = t_binding->inventory_host_delete + t_parent->inventory_host_delete
