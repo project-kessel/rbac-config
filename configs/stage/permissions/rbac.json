@@ -59,9 +59,9 @@
             "verb": "move"
         }
     ],
-    "audit_logs": [
+    "audit_log": [
         {
-            "verb": "view"
+            "verb": "read"
         }
     ],
     "*": [

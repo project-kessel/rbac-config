@@ -88,7 +88,7 @@ public type workspace { //Workspace is public so services can place resources in
     @add_unified_permission(app:'rbac', resource:'role_binding', verb:'revoke')
     relation role_binding_revoke: rbac_role_binding_revoke
 
-    @add_v1_based_permission(app:'rbac', resource:'audit_logs', verb:'read', v2_perm:'rbac_audit_log_view')
+    @add_v1_based_permission(app:'rbac', resource:'audit_log', verb:'read', v2_perm:'rbac_audit_log_view')
     relation audit_log_view: rbac_audit_log_view
 }
 
