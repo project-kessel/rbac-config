@@ -17,6 +17,7 @@
               "edit",
               "upload",
               "delete",
+              "delete_child",
               "list",
               "link",
               "unlink",

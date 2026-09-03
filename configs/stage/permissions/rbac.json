@@ -53,6 +53,9 @@
             "verb": "delete"
         },
         {
+            "verb": "delete_child"
+        },
+        {
             "verb": "move"
         }
     ],

@@ -70,8 +70,11 @@ public type workspace { //Workspace is public so services can place resources in
     @add_unified_permission(app:'rbac', resource:'workspace', verb:'edit')
     relation edit: inventory_group_edit or rbac_workspace_edit
 
+    @add_unified_permission(app:'rbac', resource:'workspace', verb:'delete_child')
+    relation delete_child: rbac_workspace_delete_child
+
     @add_unified_permission(app:'rbac', resource:'workspace', verb:'delete')
-    relation delete: inventory_group_edit or rbac_workspace_delete
+    relation delete: parent.delete_child or inventory_group_edit or rbac_workspace_delete
 
     @add_unified_permission(app:'rbac', resource:'workspace', verb:'move')
     relation move: inventory_group_edit or rbac_workspace_move
