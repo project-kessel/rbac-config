@@ -39,6 +39,31 @@
             "verb": "revoke"
         }
     ],
+    "workspace": [
+        {
+            "verb": "view"
+        },
+        {
+            "verb": "create"
+        },
+        {
+            "verb": "edit"
+        },
+        {
+            "verb": "delete"
+        },
+        {
+            "verb": "delete_child"
+        },
+        {
+            "verb": "move"
+        }
+    ],
+    "audit_log": [
+        {
+            "verb": "read"
+        }
+    ],
     "*": [
         {
             "verb": "*"
