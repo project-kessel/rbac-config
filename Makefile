@@ -6,7 +6,7 @@ endif
 GOBIN := $(shell go env GOPATH)/bin
 
 SCHEMA_REPO ?= project-kessel/starlark-unified-schema
-KSIL_SCHEMA_VERSION=v20260820.1
+KSIL_SCHEMA_VERSION=v20260904.1
 
 .PHONY: init check-go-tools ksl-schema-stage ksl-test-schema-stage ksl-schema-prod ksl-test-schema-prod update-schemas
 
