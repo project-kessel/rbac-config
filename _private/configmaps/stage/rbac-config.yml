@@ -495,8 +495,26 @@ objects:
             "system": true,
             "platform_default": false,
             "admin_default": true,
-            "version": 9,
+            "version": 10,
             "access": [
+              {
+                "permission": "rbac:workspace:view"
+              },
+              {
+                "permission": "rbac:workspace:create"
+              },
+              {
+                "permission": "rbac:workspace:edit"
+              },
+              {
+                "permission": "rbac:workspace:delete"
+              },
+              {
+                "permission": "rbac:workspace:delete_child"
+              },
+              {
+                "permission": "rbac:workspace:move"
+              },
               {
                 "permission": "inventory:groups:write"
               },
@@ -511,6 +529,9 @@ objects:
               },
               {
                 "permission": "rbac:role_binding:revoke"
+              },
+              {
+                "permission": "rbac:audit_log:read"
               }
             ]
           },
@@ -521,8 +542,11 @@ objects:
             "system": true,
             "platform_default": false,
             "admin_default": false,
-            "version": 10,
+            "version": 11,
             "access": [
+              {
+                "permission": "rbac:workspace:view"
+              },
               {
                 "permission": "inventory:groups:read"
               },
@@ -818,63 +842,6 @@ objects:
             "access": [
               {
                 "permission": "rbac:principal:read"
-              }
-            ]
-          },
-          {
-            "name": "Workspace viewer",
-            "display_name": "Workspace viewer",
-            "description": "Grants read-only access to workspace pages (lists, hierarchy, names, descriptions), but can't perform actions related to granting access or asset management.",
-            "system": true,
-            "platform_default": true,
-            "version": 2,
-            "access": [
-              {
-                "permission": "rbac:workspace:view"
-              },
-              {
-                "permission": "rbac:role_binding:view"
-              }
-            ]
-          },
-          {
-            "name": "Workspace administrator",
-            "display_name": "Workspace administrator",
-            "description": "Grants full access to workspaces. Users can create, modify and delete workspaces, and grant access to workspaces and configure user groups and roles. Users are granted this role for workspaces they create, or are given access to.",
-            "system": true,
-            "platform_default": false,
-            "admin_default": true,
-            "version": 2,
-            "access": [
-              {
-                "permission": "rbac:workspace:view"
-              },
-              {
-                "permission": "rbac:workspace:create"
-              },
-              {
-                "permission": "rbac:workspace:edit"
-              },
-              {
-                "permission": "rbac:workspace:delete"
-              },
-              {
-                "permission": "rbac:workspace:delete_child"
-              },
-              {
-                "permission": "rbac:workspace:move"
-              },
-              {
-                "permission": "rbac:role_binding:view"
-              },
-              {
-                "permission": "rbac:role_binding:grant"
-              },
-              {
-                "permission": "rbac:role_binding:revoke"
-              },
-              {
-                "permission": "rbac:audit_log:read"
               }
             ]
           }
