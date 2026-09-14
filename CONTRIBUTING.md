@@ -63,6 +63,10 @@ Before opening a PR, verify:
 - [ ] JSON files follow formatting conventions
 - [ ] Changes tested in stage before promoting to prod
 
+### Controlled prod schema promotion
+
+Schema changes follow the stage-first process. After stage sync and validation, use `.github/workflows/promote-schemas-prod.yml` rather than copying files from stage. It creates or updates a review PR only; it does not auto-merge, deploy, or update `app-interface`. Follow the [Integration Guidelines](docs/integration-guidelines.md) for the controlled promotion procedure. Dispatching requires repository **Write** access or higher.
+
 ### 4. Open a Pull Request
 
 - **Target branch:** `master`

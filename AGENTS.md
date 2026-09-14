@@ -74,6 +74,7 @@ In KSL files, hyphens in app/resource names are replaced with underscores (e.g.,
 6. **Edited `schema.zed` directly** -- It will be overwritten. Edit the `.ksl` source files.
 7. **Used `make ksl-schema-*` instead of `make ksl-test-schema-*` locally** -- The non-test targets overwrite committed files. Use the test targets which write to `_private/test-schema/`.
 8. **Wildcard `"*"` resource missing from permissions file** -- Most apps need `"*": [{"verb": "*"}]` for administrator roles that reference `app:*:*`.
+9. **Assumed every valid release JSON is promotable** -- Stage sync and prod promotion are separate flows. The manual prod promotion workflow accepts only explicitly reviewed allowlisted files; adding a provider file requires a workflow change and review.
 
 ## PR and Deployment Workflow
 
@@ -84,6 +85,10 @@ In KSL files, hyphens in app/resource names are replaced with underscores (e.g.,
 5. A separate MR in `app-interface` (GitLab) bumps the `ref` to trigger actual deployment.
 
 Reviews and deployments happen on the same day: stage on Tuesdays, prod on Thursdays.
+
+### Schema sync versus prod promotion
+
+`.github/workflows/schema-sync.yml` is the stage-first flow: it syncs the selected release into `configs/stage/schemas/src/` for validation and does not modify prod. After stage testing, `.github/workflows/promote-schemas-prod.yml` is the controlled prod flow; it accepts only reviewed allowlisted selections and opens or updates a review PR without auto-merging, deploying, or updating `app-interface`. See the [Integration Guidelines](docs/integration-guidelines.md) for the procedure and access boundary. Dispatching requires repository **Write** access or higher.
 
 ## Local Development
 

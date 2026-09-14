@@ -1,0 +1,203 @@
+name: Promote Schemas to Prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to promote (e.g. v20260804.3)'
+        required: true
+        type: string
+      files:
+        description: 'Comma-separated named root-level JSON files (e.g. features.json,tasks.json)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: promote-schemas-prod
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: Promote schema release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SCHEMA_REPO: project-kessel/starlark-unified-schema
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Add future provider files here explicitly.
+      PROMOTABLE_SCHEMA_FILES: |-
+        features.json
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true
+
+      - name: Resolve target release tag
+        id: resolve
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          TAG_RE='^v[0-9]{8}\.[0-9]+$'
+          if [[ ! "${INPUT_TAG}" =~ ${TAG_RE} ]]; then
+            echo "Invalid schema release tag: ${INPUT_TAG}"
+            echo "Expected format: vYYYYMMDD.N (e.g. v20260804.3)"
+            exit 1
+          fi
+          echo "target=${INPUT_TAG}" >> "${GITHUB_OUTPUT}"
+          echo "Target release tag: ${INPUT_TAG}"
+
+      - name: Validate requested schema files
+        id: selection
+        env:
+          INPUT_FILES: ${{ inputs.files }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import os
+          import re
+
+          raw = os.environ["INPUT_FILES"]
+          entries = [entry.strip() for entry in raw.split(",")]
+          if any(not entry for entry in entries):
+              raise SystemExit("The files input must not contain empty entries")
+          if len(entries) > 50:
+              raise SystemExit("The files input must contain no more than 50 entries")
+
+          name_pattern = re.compile(r"^[a-z0-9][a-z0-9._-]*\.json$")
+          invalid = [entry for entry in entries if not name_pattern.fullmatch(entry)]
+          if invalid:
+              raise SystemExit(
+                  "Invalid root-level JSON file name(s): " + ", ".join(invalid)
+              )
+          if len(set(entries)) != len(entries):
+              raise SystemExit("The files input must not contain duplicate entries")
+
+          promotable = {
+              entry.strip()
+              for entry in os.environ["PROMOTABLE_SCHEMA_FILES"].splitlines()
+              if entry.strip()
+          }
+          not_promotable = [entry for entry in entries if entry not in promotable]
+          if not_promotable:
+              raise SystemExit(
+                  "File(s) are not in the reviewed promotable-file allowlist: "
+                  + ", ".join(not_promotable)
+              )
+
+          selected = sorted(entries)
+          canonical = ",".join(selected)
+          selection_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:12]
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"files={canonical}\n")
+              output.write(f"hash={selection_hash}\n")
+          print(f"Canonical selection: {canonical}")
+          print(f"Selection hash: {selection_hash}")
+          PY
+
+      - name: Promote schemas and open PR
+        env:
+          TARGET: ${{ steps.resolve.outputs.target }}
+          SELECTED_FILES: ${{ steps.selection.outputs.files }}
+          SELECTION_HASH: ${{ steps.selection.outputs.hash }}
+        run: |
+          set -euo pipefail
+          BRANCH="promote-schemas-prod/${TARGET}-${SELECTION_HASH}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin master
+          git checkout -B "${BRANCH}" origin/master
+
+          ARCHIVE="${RUNNER_TEMP}/ksl.tar.gz"
+          rm -f "${ARCHIVE}"
+          gh release download "${TARGET}" \
+            --repo "${SCHEMA_REPO}" \
+            --pattern 'ksl.tar.gz' \
+            --dir "${RUNNER_TEMP}" \
+            --clobber
+          if [[ ! -f "${ARCHIVE}" || -L "${ARCHIVE}" ]]; then
+            echo "Expected release asset was not downloaded to ${ARCHIVE}"
+            exit 1
+          fi
+          ASSET_SHA256="$(sha256sum "${ARCHIVE}" | cut -d' ' -f1)"
+
+          IFS=',' read -r -a SELECTED_ARRAY <<< "${SELECTED_FILES}"
+          DESTINATIONS=()
+          for name in "${SELECTED_ARRAY[@]}"; do
+            destination="configs/prod/schemas/src/${name}"
+            if [[ -L "${destination}" ]]; then
+              echo "Refusing symlink destination: ${destination}"
+              exit 1
+            fi
+            DESTINATIONS+=("${destination}")
+          done
+          # The fixed upstream release asset is trusted. Extract only the
+          # canonical selected names; tar fails if any requested member is absent.
+          tar -xzf "${ARCHIVE}" \
+            -C configs/prod/schemas/src \
+            -- "${SELECTED_ARRAY[@]}"
+          git add -- "${DESTINATIONS[@]}"
+
+          EXPECTED_PATHS="$(printf '%s\n' "${DESTINATIONS[@]}")" \
+            python3 - <<'PY'
+          import os
+          import subprocess
+
+          expected = set(os.environ["EXPECTED_PATHS"].splitlines())
+          staged = subprocess.check_output(
+              ["git", "diff", "--cached", "--name-only", "-z"]
+          ).decode("utf-8").split("\0")
+          staged = {path for path in staged if path}
+          unexpected = sorted(staged - expected)
+          if unexpected:
+              raise SystemExit(
+                  "Unexpected staged path(s): " + ", ".join(unexpected)
+              )
+          PY
+
+          if git diff --cached --quiet; then
+            echo "No file changes after promotion; skipping commit/PR."
+            exit 0
+          fi
+
+          git commit -m "chore: promote schemas to prod from ${SCHEMA_REPO}@${TARGET}"
+          git push -u origin HEAD --force
+
+          TITLE="chore: promote selected schemas to prod from ${TARGET}"
+          PR_BODY=$(cat <<EOF
+          ## Summary
+
+          Automated schema promotion from [\`${SCHEMA_REPO}\`](https://github.com/${SCHEMA_REPO}) release \`${TARGET}\`.
+
+          - Requested root-level JSON files: \`${SELECTED_FILES}\`
+          - Exact release tag: \`${TARGET}\`
+          - \`ksl.tar.gz\` asset SHA256: \`${ASSET_SHA256}\`
+          - Validates names, count/duplicates, and the reviewed allowlist before extraction.
+          - Extracts only the requested names from the trusted fixed release asset and preserves hand-authored \`.ksl\` files and unrequested JSON.
+
+          ## Test plan
+
+          - [ ] Standard CI validation passes
+          - [ ] No auto-merge, deployment, or app-interface action is performed
+          EOF
+          )
+          PR_NUMBER="$(gh pr list --head "${BRANCH}" --state open --limit 1 --json number -q '.[0].number')"
+          if [ -z "${PR_NUMBER}" ]; then
+            gh pr create \
+              --base master \
+              --head "${BRANCH}" \
+              --title "${TITLE}" \
+              --body "${PR_BODY}"
+          else
+            gh pr edit "${PR_NUMBER}" \
+              --title "${TITLE}" \
+              --body "${PR_BODY}"
+          fi

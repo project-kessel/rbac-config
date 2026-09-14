@@ -18,6 +18,10 @@ There is no application code here -- only JSON configs, KSL schemas, and CI auto
 
 Reviews and deployments happen on the same day. All changes go to stage first.
 
+### Manual production schema promotion
+
+After stage validation, the manual `.github/workflows/promote-schemas-prod.yml` flow opens or updates a review PR for selected production schema files. It does not auto-merge or deploy; see the [Integration Guidelines](docs/integration-guidelines.md) for the procedure and access boundary.
+
 ## Documentation
 
 Detailed guidance lives in dedicated files -- the README covers only getting started and high-level reference.
