@@ -917,6 +917,9 @@ definition rbac/tenant {
 	permission remediations_edit_remediation = t_binding->remediations_edit_remediation + t_platform->remediations_edit_remediation
 	permission remediations_execute_remediation = t_binding->remediations_execute_remediation + t_platform->remediations_execute_remediation
 	permission remediations_view_remediation = t_binding->remediations_view_remediation + t_platform->remediations_view_remediation
+	permission role_binding_grant = rbac_role_binding_grant
+	permission role_binding_revoke = rbac_role_binding_revoke
+	permission role_binding_view = rbac_role_binding_view
 	permission ros_read_analysis = (inventory_host_view & ros_read_analysis_assigned)
 	permission ros_read_analysis_assigned = t_binding->ros_read_analysis_assigned + t_platform->ros_read_analysis_assigned
 	permission staleness_staleness_update = t_binding->staleness_staleness_update + t_platform->staleness_staleness_update
