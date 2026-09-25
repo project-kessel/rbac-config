@@ -31,6 +31,16 @@ internal type tenant {
     // Used in order to appease type checker in rbac/workspace. This should never be written to.
     // This should be removed when rbac/workspace.parent becomes [AtMostOne workspace].
     private relation tenant: [Any tenant]
+
+    // Semantic aliases mirroring rbac/workspace. The "all" permission scope lets
+    // rbac:role_binding:* inherit tenant scope from its companion permissions, so a
+    // role binding holding them can land on the tenant rather than a workspace. RBAC
+    // checks these under their alias names regardless of the resource type, so they
+    // must resolve here too. The underlying rbac_role_binding_* relations are added to
+    // this type by add_unified_permission, invoked from rbac/workspace below.
+    relation role_binding_view: rbac_role_binding_view
+    relation role_binding_grant: rbac_role_binding_grant
+    relation role_binding_revoke: rbac_role_binding_revoke
 }
 
 internal type group {
