@@ -1,0 +1,8 @@
+version 0.1
+namespace automation_analytics
+
+import rbac
+
+@rbac.add_v1_based_permission(app:'automation_analytics', resource:'analytics', verb:'read', v2_perm:'automation_analytics_view');
+@rbac.add_v1_based_permission(app:'automation_analytics', resource:'analytics', verb:'write', v2_perm:'automation_analytics_edit');
+@rbac.add_unified_permission(app:'automation_analytics', resource:'analytics', verb:'admin');
