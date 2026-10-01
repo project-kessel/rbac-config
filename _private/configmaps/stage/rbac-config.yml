@@ -825,7 +825,7 @@ objects:
             "system": true,
             "admin_default": true,
             "platform_default": false,
-            "version": 6,
+            "version": 7,
             "access": [
               {
                 "permission": "rbac:*:*"
