@@ -49,6 +49,9 @@ definition rbac/platform {
 	permission advisor_weekly_report_auto_subscribe_view = t_binding->advisor_weekly_report_auto_subscribe_view
 	permission advisor_weekly_report_edit = t_binding->advisor_weekly_report_edit
 	permission advisor_weekly_report_view = t_binding->advisor_weekly_report_view
+	permission automation_analytics_analytics_admin = t_binding->automation_analytics_analytics_admin
+	permission automation_analytics_edit = t_binding->automation_analytics_edit
+	permission automation_analytics_view = t_binding->automation_analytics_view
 	permission binding = t_binding
 	relation t_binding: rbac/role_binding
 	permission compliance_policy_edit = t_binding->compliance_policy_edit
@@ -209,12 +212,24 @@ definition rbac/role {
 	relation t_ansible_wisdom_admin_dashboard_chart_recommendations_read: rbac/principal:*
 	permission ansible_wisdom_admin_dashboard_chart_user_sentiment_read = t_ansible_wisdom_admin_dashboard_chart_user_sentiment_read
 	relation t_ansible_wisdom_admin_dashboard_chart_user_sentiment_read: rbac/principal:*
+	permission automation_analytics_all_admin = t_automation_analytics_all_admin
+	relation t_automation_analytics_all_admin: rbac/principal:*
 	permission automation_analytics_all_all = t_automation_analytics_all_all
 	relation t_automation_analytics_all_all: rbac/principal:*
 	permission automation_analytics_all_read = t_automation_analytics_all_read
 	relation t_automation_analytics_all_read: rbac/principal:*
 	permission automation_analytics_all_write = t_automation_analytics_all_write
 	relation t_automation_analytics_all_write: rbac/principal:*
+	permission automation_analytics_analytics_admin = t_automation_analytics_analytics_admin + automation_analytics_analytics_all + automation_analytics_all_admin + automation_analytics_all_all + all_all_all + t_child->automation_analytics_analytics_admin
+	relation t_automation_analytics_analytics_admin: rbac/principal:*
+	permission automation_analytics_analytics_all = t_automation_analytics_analytics_all
+	relation t_automation_analytics_analytics_all: rbac/principal:*
+	permission automation_analytics_analytics_read = t_automation_analytics_analytics_read
+	relation t_automation_analytics_analytics_read: rbac/principal:*
+	permission automation_analytics_analytics_write = t_automation_analytics_analytics_write
+	relation t_automation_analytics_analytics_write: rbac/principal:*
+	permission automation_analytics_edit = automation_analytics_analytics_write + automation_analytics_analytics_all + automation_analytics_all_write + automation_analytics_all_all + all_all_all + t_child->automation_analytics_edit
+	permission automation_analytics_view = automation_analytics_analytics_read + automation_analytics_analytics_all + automation_analytics_all_read + automation_analytics_all_all + all_all_all + t_child->automation_analytics_view
 	permission child = t_child
 	relation t_child: rbac/role
 	permission compliance_all_all = t_compliance_all_all
@@ -748,6 +763,9 @@ definition rbac/role_binding {
 	permission advisor_weekly_report_auto_subscribe_view = (subject & t_role->advisor_weekly_report_auto_subscribe_view)
 	permission advisor_weekly_report_edit = (subject & t_role->advisor_weekly_report_edit)
 	permission advisor_weekly_report_view = (subject & t_role->advisor_weekly_report_view)
+	permission automation_analytics_analytics_admin = (subject & t_role->automation_analytics_analytics_admin)
+	permission automation_analytics_edit = (subject & t_role->automation_analytics_edit)
+	permission automation_analytics_view = (subject & t_role->automation_analytics_view)
 	permission compliance_policy_edit = (subject & t_role->compliance_policy_edit)
 	permission compliance_policy_new = (subject & t_role->compliance_policy_new)
 	permission compliance_policy_remove = (subject & t_role->compliance_policy_remove)
@@ -847,6 +865,9 @@ definition rbac/tenant {
 	permission advisor_weekly_report_auto_subscribe_view = t_binding->advisor_weekly_report_auto_subscribe_view + t_platform->advisor_weekly_report_auto_subscribe_view
 	permission advisor_weekly_report_edit = t_binding->advisor_weekly_report_edit + t_platform->advisor_weekly_report_edit
 	permission advisor_weekly_report_view = t_binding->advisor_weekly_report_view + t_platform->advisor_weekly_report_view
+	permission automation_analytics_analytics_admin = t_binding->automation_analytics_analytics_admin + t_platform->automation_analytics_analytics_admin
+	permission automation_analytics_edit = t_binding->automation_analytics_edit + t_platform->automation_analytics_edit
+	permission automation_analytics_view = t_binding->automation_analytics_view + t_platform->automation_analytics_view
 	permission binding = t_binding
 	relation t_binding: rbac/role_binding
 	permission compliance_policy_edit = t_binding->compliance_policy_edit + t_platform->compliance_policy_edit
@@ -967,6 +988,9 @@ definition rbac/workspace {
 	permission advisor_weekly_report_edit = t_binding->advisor_weekly_report_edit + t_parent->advisor_weekly_report_edit
 	permission advisor_weekly_report_view = t_binding->advisor_weekly_report_view + t_parent->advisor_weekly_report_view
 	permission audit_log_view = rbac_audit_log_view
+	permission automation_analytics_analytics_admin = t_binding->automation_analytics_analytics_admin + t_parent->automation_analytics_analytics_admin
+	permission automation_analytics_edit = t_binding->automation_analytics_edit + t_parent->automation_analytics_edit
+	permission automation_analytics_view = t_binding->automation_analytics_view + t_parent->automation_analytics_view
 	permission binding = t_binding + t_parent->binding
 	relation t_binding: rbac/role_binding
 	permission compliance_policy_edit = t_binding->compliance_policy_edit + t_parent->compliance_policy_edit
