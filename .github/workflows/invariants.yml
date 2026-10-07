@@ -1,0 +1,16 @@
+on:
+  pull_request:
+    branches:
+      - master
+name: Invariants
+permissions:
+  contents: read
+jobs:
+  invariants:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.7
+        with:
+          fetch-depth: 0
+      - name: Run invariant checks
+        run: bash scripts/check-invariants.sh master

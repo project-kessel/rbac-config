@@ -21,6 +21,11 @@ jobs:
           schema: ./schemas/roles.schema
           print-valid-files: true
           strict: false
+      - name: Validate Role Name Uniqueness
+        run: |
+          python3 -m unittest discover -s tests
+          python3 scripts/validate_role_uniqueness.py
+
       - name: Validate Permissions' Dependencies
         uses: project-kessel/rbac-config-actions/validate-permission-dependencies@main
         with:

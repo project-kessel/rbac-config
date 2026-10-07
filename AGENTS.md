@@ -64,6 +64,17 @@ In KSL files, hyphens in app/resource names are replaced with underscores (e.g.,
 - `configs/*/schemas/schema.zed` -- Generated from KSL source files. Edit `.ksl` files instead.
 - `configs/*/schemas/src/rbac_v1_permissions.json` -- Build artifact (gitignored).
 
+## AI Agent Output Rules
+
+These apply to every AI agent (Claude Code, Cursor, CodeRabbit, SOVA, and others) and to everything it writes: code, configs, docs, commit messages, PR descriptions, and review comments. The first three are enforced on every PR by `.github/workflows/invariants.yml` (run locally with `bash scripts/check-invariants.sh`).
+
+- **No AI attribution**: never add `Co-Authored-By` trailers naming an AI tool, and never add "Generated with Claude Code" or similar AI branding to commits or PR descriptions.
+- **No emojis**: not in code, configs, documentation, commit messages, or PR descriptions.
+- **No ` -- ` separators in prose**: use a colon, comma, period, or parentheses instead. Write `Fixed: updated the role version`, not `Fixed -- updated the role version`. Command-line flags and code are unaffected.
+- **Comments only when the reason is non-obvious**: do not narrate what the code does, and do not reference the ticket, task, or caller in comments. That context belongs in the commit message and PR description.
+- **No AI tooling in git**: `.claude/`, `.sova/`, `.cursor/`, and `sova.toml` are per-developer and gitignored. Never commit agent commands, rules, memory, worktrees, or databases. `AGENTS.md` and `CLAUDE.md` are the only tracked agent guidance.
+- **Stay in scope**: a PR changes only what its ticket requires. Do not bundle unrelated documentation rewrites, renumbering, or tooling.
+
 ## Common Pitfalls
 
 1. **Forgot to bump `version`** -- The single most common mistake. Changes will not take effect.

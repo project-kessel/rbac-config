@@ -8,7 +8,7 @@ GOBIN := $(shell go env GOPATH)/bin
 SCHEMA_REPO ?= project-kessel/starlark-unified-schema
 KSIL_SCHEMA_VERSION=v20260910.1
 
-.PHONY: init check-go-tools ksl-schema-stage ksl-test-schema-stage ksl-schema-prod ksl-test-schema-prod update-schemas
+.PHONY: init check check-go-tools test validate-roles invariants ksl-schema-stage ksl-test-schema-stage ksl-schema-prod ksl-test-schema-prod update-schemas
 
 init:
 	@HASH=$$(git ls-remote https://github.com/project-kessel/ksl-schema-language.git HEAD | cut -f1) && \
@@ -16,6 +16,14 @@ init:
 
 	@HASH=$$(git ls-remote https://github.com/project-kessel/rbac-config-actions.git HEAD | cut -f1) && \
 	go install github.com/project-kessel/rbac-config-actions/generate-v1-only-permissions/cmd/generate-v1-only-permissions@$$HASH
+
+# Everything a contributor can verify locally before opening a PR: the
+# validation scripts' own tests, role uniqueness, and a KSL compile of both
+# environments into _private/test-schema. The remaining PR checks (JSON Schema
+# validation, permission dependencies, SpiceDB schema validation) run only as
+# GitHub Actions.
+check: test validate-roles invariants ksl-test-schema-stage ksl-test-schema-prod
+	@echo "All local checks passed."
 
 check-go-tools:
 	@echo "Checking required Go tools..."
@@ -29,6 +37,21 @@ check-go-tools:
 	else \
 		echo "✗ ksl: NOT installed (run 'make init')"; \
 	fi
+
+# Tests for the scripts under scripts/. Standard library unittest only, so no
+# Python dependencies to install.
+test:
+	python3 -m unittest discover -s tests
+
+# Role name and display_name uniqueness, checked per environment. Mirrors the
+# "Validate Role Name Uniqueness" step in .github/workflows/pr.yml.
+validate-roles:
+	python3 scripts/validate_role_uniqueness.py
+
+# Guards against AI-generated artifacts: AI co-author trailers, emojis, and
+# " -- " prose separators. Mirrors .github/workflows/invariants.yml.
+invariants:
+	bash scripts/check-invariants.sh master
 
 # Stage environment targets
 configs/stage/schemas/src/rbac_v1_permissions.json: configs/stage/permissions/*.json configs/stage/schemas/*.lst
