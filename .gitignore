@@ -4,3 +4,10 @@ ksl.tar.gz
 
 # Local test outputs
 _private/test-schema/
+
+# Python bytecode cache
+__pycache__/
+
+# Local AI agent tooling
+.claude/
+.cursor/
