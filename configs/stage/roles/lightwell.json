@@ -1,0 +1,64 @@
+{
+  "roles": [
+    {
+      "name": "Lightwell clearinghouse editor",
+      "description": "Upload files to Lightwell intake and read clearinghouse submissions.",
+      "system": true,
+      "admin_default": true,
+      "version": 2,
+      "access": [
+        {
+          "permission": "lightwell:submission:upload"
+        },
+        {
+          "permission": "lightwell:submission:read"
+        }
+      ]
+    },
+    {
+      "name": "Lightwell clearinghouse reader",
+      "description": "Read Lightwell clearinghouse submissions.",
+      "system": true,
+      "admin_default": true,
+      "version": 2,
+      "access": [
+        {
+          "permission": "lightwell:submission:read"
+        }
+      ]
+    },
+    {
+      "name": "Lightwell validated, remediated, and predisclosure reader",
+      "description": "Read validated, remediated, and predisclosure package repositories, including lens access.",
+      "system": true,
+      "admin_default": true,
+      "version": 2,
+      "access": [
+        {
+          "permission": "lightwell:packages.rebuilds:read"
+        },
+        {
+          "permission": "lightwell:packages.backports:read"
+        },
+        {
+          "permission": "lightwell:packages.novel:read"
+        }
+      ]
+    },
+    {
+      "name": "Lightwell validated and remediated reader",
+      "description": "Read validated and remediated package repositories, including lens access.",
+      "system": true,
+      "platform_default": true,
+      "version": 2,
+      "access": [
+        {
+          "permission": "lightwell:packages.rebuilds:read"
+        },
+        {
+          "permission": "lightwell:packages.backports:read"
+        }
+      ]
+    }
+  ]
+}
