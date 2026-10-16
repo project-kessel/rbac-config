@@ -433,6 +433,16 @@ definition rbac/role {
 	relation t_inventory_views_read: rbac/principal:*
 	permission inventory_views_write = t_inventory_views_write
 	relation t_inventory_views_write: rbac/principal:*
+	permission lightwell_packages_backports_read = t_lightwell_packages_backports_read
+	relation t_lightwell_packages_backports_read: rbac/principal:*
+	permission lightwell_packages_novel_read = t_lightwell_packages_novel_read
+	relation t_lightwell_packages_novel_read: rbac/principal:*
+	permission lightwell_packages_rebuilds_read = t_lightwell_packages_rebuilds_read
+	relation t_lightwell_packages_rebuilds_read: rbac/principal:*
+	permission lightwell_submission_read = t_lightwell_submission_read
+	relation t_lightwell_submission_read: rbac/principal:*
+	permission lightwell_submission_upload = t_lightwell_submission_upload
+	relation t_lightwell_submission_upload: rbac/principal:*
 	permission malware_detection_acknowledgements_all = t_malware_detection_acknowledgements_all
 	relation t_malware_detection_acknowledgements_all: rbac/principal:*
 	permission malware_detection_acknowledgements_write = t_malware_detection_acknowledgements_write
