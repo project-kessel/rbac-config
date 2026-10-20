@@ -1,0 +1,190 @@
+version 0.1
+namespace cost_management
+
+import rbac
+
+// ==============================================================================
+// 1. RBAC V1 to V2 Permission Mappings (Default Workspace Pattern)
+// ==============================================================================
+// Standard V2 permissions checkable at the workspace level (Default Workspace,
+// Root Workspace, or child workspaces).
+
+@rbac.add_v1_based_permission(app:'cost_management', resource:'cost_model', verb:'read', v2_perm:'cost_management_cost_model_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'cost_model', verb:'write', v2_perm:'cost_management_cost_model_edit');
+
+@rbac.add_v1_based_read_with_write(app:'cost_management', resource:'settings', v2_perm:'cost_management_settings_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'settings', verb:'write', v2_perm:'cost_management_settings_edit');
+
+@rbac.add_v1_based_permission(app:'cost_management', resource:'openshift_cluster', verb:'read', v2_perm:'cost_management_cluster_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'openshift_node', verb:'read', v2_perm:'cost_management_node_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'openshift_project', verb:'read', v2_perm:'cost_management_project_view');
+
+@rbac.add_v1_based_permission(app:'cost_management', resource:'aws_account', verb:'read', v2_perm:'cost_management_aws_account_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'aws_organizational_unit', verb:'read', v2_perm:'cost_management_aws_ou_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'azure_subscription_guid', verb:'read', v2_perm:'cost_management_azure_subscription_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'gcp_account', verb:'read', v2_perm:'cost_management_gcp_account_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'gcp_project', verb:'read', v2_perm:'cost_management_gcp_project_view');
+
+
+// Whole-resource permissions are authoritative V1 projections to native
+// rbac.principal IDs. Containment is identity, not an authorization path. Projection
+// writers must validate tenant, resource identity, and freshness before writing.
+
+public type authorization_scope {
+    private relation eligible: [Any rbac.principal]
+    public relation access: eligible
+}
+
+public type cluster {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    relation tenant: workspace.tenant
+    private relation v1_effective_grant: [Any rbac.principal]
+    public relation view: scope.access and v1_effective_grant
+}
+
+public type node {
+    private relation cluster: [AtMostOne cluster]
+    private relation workspace: [AtMostOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    relation tenant: cluster.tenant or workspace.tenant
+    private relation v1_effective_grant: [Any rbac.principal]
+    public relation view: scope.access and v1_effective_grant
+}
+
+public type project {
+    private relation cluster: [AtMostOne cluster]
+    private relation workspace: [AtMostOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    relation tenant: cluster.tenant or workspace.tenant
+    private relation v1_effective_grant: [Any rbac.principal]
+    public relation view: scope.access and v1_effective_grant
+}
+
+public type aws_account {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    relation tenant: workspace.tenant
+    private relation parent_ou: [AtMostOne aws_ou]
+    private relation v1_effective_grant: [Any rbac.principal]
+    public relation view: scope.access and v1_effective_grant
+}
+
+public type aws_ou {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    relation tenant: workspace.tenant
+    private relation parent_ou: [AtMostOne aws_ou]
+    private relation v1_effective_grant: [Any rbac.principal]
+    public relation view: scope.access and v1_effective_grant
+}
+
+public type azure_subscription {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    relation tenant: workspace.tenant
+    private relation v1_effective_grant: [Any rbac.principal]
+    public relation view: scope.access and v1_effective_grant
+}
+
+public type gcp_account {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    relation tenant: workspace.tenant
+    private relation v1_effective_grant: [Any rbac.principal]
+    public relation view: scope.access and v1_effective_grant
+}
+
+public type gcp_project {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    relation tenant: workspace.tenant
+    private relation v1_effective_grant: [Any rbac.principal]
+    public relation view: scope.access and v1_effective_grant
+}
+
+public type cost_model {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    relation tenant: workspace.tenant
+    private relation v1_effective_grant: [Any rbac.principal]
+    private relation effective_edit_grant: [Any rbac.principal]
+    public relation edit: scope.access and effective_edit_grant
+    public relation view: scope.access and (v1_effective_grant or edit)
+}
+
+public type cluster_cost_reference {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    private relation target: [ExactlyOne cluster]
+    relation tenant: workspace.tenant
+    public relation view: scope.access and workspace.cost_management_cluster_view and target.view
+}
+
+public type node_cost_reference {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    private relation target: [ExactlyOne node]
+    relation tenant: workspace.tenant
+    public relation view: scope.access and workspace.cost_management_node_view and target.view
+}
+
+public type project_cost_reference {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    private relation target: [ExactlyOne project]
+    relation tenant: workspace.tenant
+    public relation view: scope.access and workspace.cost_management_project_view and target.view
+}
+
+public type aws_cost_reference {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    private relation target: [ExactlyOne aws_account]
+    relation tenant: workspace.tenant
+    public relation view: scope.access and workspace.cost_management_aws_account_view and target.view
+}
+
+public type aws_ou_cost_reference {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    private relation target: [ExactlyOne aws_ou]
+    relation tenant: workspace.tenant
+    public relation view: scope.access and workspace.cost_management_aws_ou_view and target.view
+}
+
+public type azure_cost_reference {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    private relation target: [ExactlyOne azure_subscription]
+    relation tenant: workspace.tenant
+    public relation view: scope.access and workspace.cost_management_azure_subscription_view and target.view
+}
+
+public type gcp_cost_reference {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    private relation target: [ExactlyOne gcp_account]
+    relation tenant: workspace.tenant
+    public relation view: scope.access and workspace.cost_management_gcp_account_view and target.view
+}
+
+public type gcp_project_cost_reference {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    private relation target: [ExactlyOne gcp_project]
+    relation tenant: workspace.tenant
+    public relation view: scope.access and workspace.cost_management_gcp_project_view and target.view
+}
+
+public type cost_slice {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    private relation scope: [ExactlyOne authorization_scope]
+    relation tenant: workspace.tenant
+    private relation target_node: [ExactlyOne node]
+    private relation target_project: [ExactlyOne project]
+    // A writer grants this only after resolving V1's complete decision for this
+    // exact node/project pair. It does not grant either target's whole view.
+    private relation effective_pair_grant: [Any rbac.principal]
+    public relation view: scope.access and workspace.cost_management_project_view and effective_pair_grant
+}
