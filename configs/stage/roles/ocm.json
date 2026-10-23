@@ -62,7 +62,7 @@
     },
     {
       "name": "OCM Organization Admin",
-      "display_name": "OCM Organization Administrator",
+      "display_name": "OCM organization Administrator",
       "description": "Perform all available operations on the associated organization's clusters.",
       "system": true,
       "platform_default": false,
