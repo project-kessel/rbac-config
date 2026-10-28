@@ -28,9 +28,6 @@
           "permission": "config-manager:activation_keys:write"
         },
         {
-          "permission": "config-manager:profile:read"
-        },
-        {
           "permission": "content-sources:repositories:read"
         },
         {
@@ -124,9 +121,6 @@
         },
         {
           "permission": "config-manager:activation_keys:write"
-        },
-        {
-          "permission": "config-manager:profile:read"
         },
         {
           "permission": "content-sources:repositories:read"
@@ -255,12 +249,6 @@
         },
         {
           "permission": "config-manager:activation_keys:write"
-        },
-        {
-          "permission": "config-manager:profile:read"
-        },
-        {
-          "permission": "config-manager:profile:write"
         },
         {
           "permission": "content-sources:repositories:read"

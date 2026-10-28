@@ -23,14 +23,6 @@
             "verb": "write"
         }
     ],
-    "config_manager_run": [
-        {
-            "verb": "read"
-        },
-        {
-            "verb": "write"
-        }
-    ],
     "run": [
         {
             "verb": "read"
