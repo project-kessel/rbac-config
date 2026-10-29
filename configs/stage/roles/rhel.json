@@ -7,7 +7,7 @@
       "system": true,
       "platform_default": false,
       "admin_default": false,
-      "version": 8,
+      "version": 9,
       "access": [
         {
           "permission": "advisor:*:read"
@@ -99,7 +99,7 @@
       "system": true,
       "platform_default": false,
       "admin_default": false,
-      "version": 10,
+      "version": 11,
       "access": [
         {
           "permission": "advisor:*:*"
@@ -236,7 +236,7 @@
       "system": true,
       "platform_default": false,
       "admin_default": false,
-      "version": 8,
+      "version": 9,
       "access": [
         {
           "permission": "advisor:*:*"

@@ -137,6 +137,27 @@ objects:
             "access": [
               {
                 "permission": "config-manager:activation_keys:*"
+              },
+              {
+                "permission": "config-manager:profile:*"
+              },
+              {
+                "permission": "playbook-dispatcher:config_manager_run:read"
+              },
+              {
+                "permission": "playbook-dispatcher:run:read",
+                "resourceDefinitions": [
+                  {
+                    "attributeFilter": {
+                      "key": "service",
+                      "operation": "equal",
+                      "value": "config_manager"
+                    }
+                  }
+                ]
+              },
+              {
+                "permission": "subscriptions:organization:read"
               }
             ]
           },
@@ -153,6 +174,24 @@ objects:
               },
               {
                 "permission": "config-manager:activation_keys:write"
+              },
+              {
+                "permission": "config-manager:profile:read"
+              },
+              {
+                "permission": "playbook-dispatcher:config_manager_run:read"
+              },
+              {
+                "permission": "playbook-dispatcher:run:read",
+                "resourceDefinitions": [
+                  {
+                    "attributeFilter": {
+                      "key": "service",
+                      "operation": "equal",
+                      "value": "config_manager"
+                    }
+                  }
+                ]
               }
             ]
           }
@@ -966,6 +1005,9 @@ objects:
                 "permission": "config-manager:activation_keys:write"
               },
               {
+                "permission": "config-manager:profile:read"
+              },
+              {
                 "permission": "content-sources:repositories:read"
               },
               {
@@ -1059,6 +1101,9 @@ objects:
               },
               {
                 "permission": "config-manager:activation_keys:write"
+              },
+              {
+                "permission": "config-manager:profile:read"
               },
               {
                 "permission": "content-sources:repositories:read"
@@ -1187,6 +1232,12 @@ objects:
               },
               {
                 "permission": "config-manager:activation_keys:write"
+              },
+              {
+                "permission": "config-manager:profile:read"
+              },
+              {
+                "permission": "config-manager:profile:write"
               },
               {
                 "permission": "content-sources:repositories:read"

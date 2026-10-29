@@ -122,6 +122,17 @@ objects:
               {
                   "verb": "*"
               }
+          ],
+          "profile": [
+              {
+                  "verb": "read"
+              },
+              {
+                  "verb": "write"
+              },
+              {
+                  "verb": "*"
+              }
           ]
       }
     content-sources.json: |
@@ -472,6 +483,14 @@ objects:
               }
           ],
           "tasks_run": [
+              {
+                  "verb": "read"
+              },
+              {
+                  "verb": "write"
+              }
+          ],
+          "config_manager_run": [
               {
                   "verb": "read"
               },
