@@ -122,17 +122,6 @@ objects:
               {
                   "verb": "*"
               }
-          ],
-          "profile": [
-              {
-                  "verb": "read"
-              },
-              {
-                  "verb": "write"
-              },
-              {
-                  "verb": "*"
-              }
           ]
       }
     content-sources.json: |
