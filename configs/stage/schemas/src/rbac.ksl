@@ -1,11 +1,6 @@
 version 0.1
 namespace rbac
 
-// Placeholder permissions that are being deprecated
-@add_v1only_permission(perm:'config_manager_state_changes_read');
-@add_v1only_permission(perm:'config_manager_state_read');
-@add_v1only_permission(perm:'config_manager_state_write');
-
 // RBAC service permissions
 @add_unified_permission(app:'rbac', resource:'principal', verb:'read')
 @add_unified_permission(app:'rbac', resource:'principal', verb:'write')
