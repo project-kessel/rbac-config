@@ -1,0 +1,25 @@
+{
+    "submission": [
+        {
+            "verb": "upload"
+        },
+        {
+            "verb": "read"
+        }
+    ],
+    "packages.rebuilds": [
+        {
+            "verb": "read"
+        }
+    ],
+    "packages.backports": [
+        {
+            "verb": "read"
+        }
+    ],
+    "packages.novel": [
+        {
+            "verb": "read"
+        }
+    ]
+}
