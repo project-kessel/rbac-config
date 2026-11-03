@@ -1,0 +1,116 @@
+// cost_management.ksl — Kessel authorization schema for Cost Management
+//
+// This schema defines:
+// 1. Workspace-level permissions (checked via Check on workspace)
+// 2. Resource types reported to Kessel Inventory (workspace-bound)
+//
+// Naming:
+//   app:'cost_management' maps to V1 app 'cost-management' (hyphen→underscore)
+//   resource names use underscores for dots: aws.account → aws_account
+//   v2_perm follows <namespace>_<resource>_<operation> convention
+
+version 0.1
+namespace cost_management
+
+import rbac
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Workspace-level permissions (binary, org-wide scope)
+// These attach to rbac.workspace and are inherited down the workspace tree.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// --- Cloud provider read permissions ---
+
+@rbac.add_v1_based_permission(app:'cost_management', resource:'aws_account', verb:'read', v2_perm:'cost_management_aws_account_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'aws_organizational_unit', verb:'read', v2_perm:'cost_management_aws_organizational_unit_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'azure_subscription_guid', verb:'read', v2_perm:'cost_management_azure_subscription_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'gcp_account', verb:'read', v2_perm:'cost_management_gcp_account_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'gcp_project', verb:'read', v2_perm:'cost_management_gcp_project_view');
+
+// --- OpenShift resource read permissions ---
+
+@rbac.add_v1_based_permission(app:'cost_management', resource:'openshift_cluster', verb:'read', v2_perm:'cost_management_ocp_cluster_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'openshift_node', verb:'read', v2_perm:'cost_management_ocp_node_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'openshift_project', verb:'read', v2_perm:'cost_management_ocp_project_view');
+
+// --- Cost model CRUD permissions ---
+
+@rbac.add_v1_based_permission(app:'cost_management', resource:'cost_model', verb:'read', v2_perm:'cost_management_cost_model_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'cost_model', verb:'write', v2_perm:'cost_management_cost_model_edit');
+
+// --- Settings permissions ---
+
+@rbac.add_v1_based_permission(app:'cost_management', resource:'settings', verb:'read', v2_perm:'cost_management_settings_view');
+@rbac.add_v1_based_permission(app:'cost_management', resource:'settings', verb:'write', v2_perm:'cost_management_settings_edit');
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Resource types — reported to Kessel Inventory via ReportResource
+//
+// Each type binds to exactly one workspace (1:1 constraint).
+// The view permission inherits from the workspace, so workspace role
+// bindings control which users see which resources.
+//
+// Domain hierarchy (cluster→node→project, OU→account) is modeled via
+// workspace hierarchy, NOT via inter-resource relations. This keeps the
+// schema simple and delegates hierarchy expansion to SpiceDB workspace
+// traversal instead of application-side tree walks.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// --- Cloud provider resources ---
+
+public type aws_account {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    relation view: workspace.cost_management_aws_account_view
+}
+
+public type aws_organizational_unit {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    relation view: workspace.cost_management_aws_organizational_unit_view
+}
+
+public type azure_subscription {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    relation view: workspace.cost_management_azure_subscription_view
+}
+
+public type gcp_account {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    relation view: workspace.cost_management_gcp_account_view
+}
+
+public type gcp_project {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    relation view: workspace.cost_management_gcp_project_view
+}
+
+// --- OpenShift resources ---
+
+public type ocp_cluster {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    relation view: workspace.cost_management_ocp_cluster_view
+}
+
+// Reported beside the cluster, not under it. There is no cluster relation.
+// localResourceId includes the cluster name, for example cluster0.gpunode1,
+// so two nodes named node1 stay distinct. view follows this workspace arrow.
+// A group that should see only some nodes gets a child workspace inside the
+// region. Only those nodes point at the child, and the group is bound there.
+// A subset in two regions is two child workspaces and two bindings.
+public type ocp_node {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    relation view: workspace.cost_management_ocp_node_view
+}
+
+public type ocp_project {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    relation view: workspace.cost_management_ocp_project_view
+}
+
+// --- Cost model (UUID-scoped CRUD) ---
+
+public type cost_model {
+    private relation workspace: [ExactlyOne rbac.workspace]
+    relation view: workspace.cost_management_cost_model_view
+    relation edit: workspace.cost_management_cost_model_edit
+}
