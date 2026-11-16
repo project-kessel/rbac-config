@@ -1429,7 +1429,7 @@ objects:
             "description": "Perform read operations on any Subscriptions resource.",
             "system": true,
             "platform_default": true,
-            "version": 8,
+            "version": 9,
             "access": [
               {
                 "permission": "subscriptions:reports:read"
@@ -1445,6 +1445,9 @@ objects:
               },
               {
                 "permission": "subscriptions:cloud_access:read"
+              },
+              {
+                "permission": "subscriptions:workspaces:read"
               }
             ]
           }
