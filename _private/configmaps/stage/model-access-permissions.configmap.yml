@@ -682,6 +682,14 @@ objects:
                   "verb": "write"
               }
           ],
+          "workspaces": [
+              {
+                  "verb": "read"
+              },
+              {
+                  "verb": "write"
+              }
+          ],
           "*": [
               {
                   "verb": "*"
