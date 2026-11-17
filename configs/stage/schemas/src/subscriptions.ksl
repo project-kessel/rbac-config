@@ -12,3 +12,5 @@ import rbac
 @rbac.add_v1_based_permission(app:'subscriptions', resource:'products', verb:'write', v2_perm:'subscriptions_product_edit');
 @rbac.add_v1_based_permission(app:'subscriptions', resource:'cloud_access', verb:'read', v2_perm:'subscriptions_cloud_access_view');
 @rbac.add_v1_based_permission(app:'subscriptions', resource:'cloud_access', verb:'write', v2_perm:'subscriptions_cloud_access_edit');
+@rbac.add_unified_permission(app:'subscriptions', resource:'workspaces', verb:'read');
+@rbac.add_unified_permission(app:'subscriptions', resource:'workspaces', verb:'write');
