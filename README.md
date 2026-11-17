@@ -1,6 +1,6 @@
 # RBAC Config
 
-Declarative JSON configurations for roles and permissions in the [Red Hat Hybrid Cloud Console](https://console.redhat.com) RBAC service. These configs are seeded into every tenant/account. The repository also contains Kessel Schema Language (KSL) files that compile to SpiceDB authorization schemas for the V2 authorization model.
+Declarative JSON configurations for roles and permissions in the [Red Hat Hybrid Cloud Console](https://console.redhat.com) RBAC service. These configs are seeded into every tenant/account. The repository also contains Kessel Schema Language (KSL) and Kessel Schema Intermediate Language (KSIL) files that compile to SpiceDB authorization schemas for the V2 authorization model.
 
 There is no application code here -- only JSON configs, KSL schemas, and CI automation.
 
@@ -52,6 +52,7 @@ configs/
     permissions/<app>.json  # One file per app; filename = app namespace
     roles/<app>.json        # One file per app; contains a "roles" array
     schemas/
+      src/*.json            # KSIL modules for Kessel/SpiceDB. Source files are located in: https://github.com/project-kessel/starlark-unified-schema/tree/main/schema
       src/*.ksl             # KSL source files for Kessel/SpiceDB
       migrated_apps.lst     # Apps using V2 authorization
       schema.zed            # GENERATED -- never edit manually
@@ -81,6 +82,10 @@ make update-schemas KSIL_SCHEMA_VERSION=vYYYYMMDD.N   # Overlay KSIL JSON into s
 Test schemas are written to `_private/test-schema/stage-schema.zed` and `_private/test-schema/prod-schema.zed`.
 
 **Important:** Do not run `make ksl-schema-stage` or `make ksl-schema-prod` locally -- those targets overwrite committed files. Always use the `ksl-test-schema-*` targets.
+
+**Important:** Do not update KSIL modules - configs/(stage|prod)/schemas/src/*.json - in-place. Update the source files in the [starlark-unified-schema](https://github.com/project-kessel/starlark-unified-schema/tree/main/schema) repository instead.
+
+**Note:** There is a progressive migration in process from KSL to the new Kessel schema in the [starlark-unified-schema](https://github.com/project-kessel/starlark-unified-schema/tree/main/schema) repository. If you're looking for a *.ksl file that's been replaced with a *.json file, look for the corresponding sources there.
 
 After you clone the RBAC service repo, you can replace the contents in `insights-rbac/rbac/management/role/(definitions|permissions)` with the JSON files from the `configs` folders here.
 
