@@ -236,7 +236,7 @@
       "system": true,
       "platform_default": false,
       "admin_default": false,
-      "version": 9,
+      "version": 10,
       "access": [
         {
           "permission": "advisor:*:*"
@@ -339,9 +339,6 @@
         },
         {
           "permission": "staleness:staleness:write"
-        },
-        {
-          "permission": "tasks:*:*"
         },
         {
           "permission": "vulnerability:*:*"
