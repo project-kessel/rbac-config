@@ -43,6 +43,9 @@ The following system roles intentionally grant write verbs to every tenant user.
 | `RHC Viewer` | `configs/*/roles/config-manager.json` | `config-manager:activation_keys:write` | Every user must read RHC configuration and update activation keys. UI label is `display_name: "RHC user"` (immutable `name` kept for DB stability). |
 | `Inventory Hosts Administrator` | `configs/*/roles/inventory.json` | `inventory:hosts:write` | Every user must read and update Inventory host records (also `admin_default: true` so org admins retain the same grant). |
 | `Remediations user` | `configs/*/roles/remediations.json` | `remediations:remediation:write` | Every user must create, update, and delete remediations as part of standard Insights workflows. |
+| `Automation Analytics Editor` | `configs/*/roles/automation-analytics.json` | `automation-analytics:*:write` | Every user must read and update Automation Analytics resources without an explicit role assignment. |
+| `Insights administrator` | `configs/*/roles/insights.json` | `advisor:*:*` (includes `advisor:disable-recommendations:write`) | Every user must fully operate RHEL Advisor (view, disable recommendations, and related writes). UI label is `display_name: "RHEL Advisor administrator"`. |
+| `OCP Advisor administrator` | `configs/*/roles/ocp-advisor.json` | `ocp-advisor:*:*` (includes `ocp-advisor:toggle-recommendations:write`) | Every user must fully operate OCP Advisor, including toggling recommendations. |
 
 ## 5. Cross-Service Permission References
 
