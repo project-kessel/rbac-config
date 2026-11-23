@@ -1,7 +1,0 @@
-version 0.1
-namespace tasks
-
-import rbac
-
-@rbac.add_v1_based_permission(app:'tasks', resource:'task', verb:'read', v2_perm:'tasks_task_view');
-@rbac.add_v1_based_permission(app:'tasks', resource:'task', verb:'write', v2_perm:'tasks_task_edit');
