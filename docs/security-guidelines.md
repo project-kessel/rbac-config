@@ -29,10 +29,23 @@ Every role in `configs/*/roles/<app>.json` must satisfy these schema requirement
 
 These flags control automatic role assignment and have significant security impact:
 
-- `platform_default: true` -- the role is assigned to ALL users in a tenant via the platform default group. This grants permissions to every principal, so only attach read-only or universally safe permissions.
-- `admin_default: true` -- the role is automatically assigned to org admins only. Use this for administrative capabilities like `rbac:*:*` or service-wide `*:*:*` access.
-- Both flags can be true simultaneously (e.g., `Inventory Hosts Administrator` has both), meaning all users AND admins get the role, but this is uncommon and should be scrutinized.
+- `platform_default: true`: the role is assigned to ALL users in a tenant via the platform default group. Prefer read-only or universally safe permissions. Write/execute verbs are allowed only when product requirements need every authenticated tenant user to perform those actions without an explicit role assignment; document each exception below.
+- `admin_default: true`: the role is automatically assigned to org admins only. Use this for administrative capabilities like `rbac:*:*` or service-wide `*:*:*` access.
+- Both flags can be true simultaneously (e.g., `Inventory Hosts Administrator` has both), meaning all users AND admins get the role. Prefer this only when the same grant must cover both populations.
 - Omitting a flag is equivalent to `false`, but explicitly setting `false` is preferred for clarity and to show intent.
+
+### Accepted `platform_default` write grants
+
+The following system roles intentionally grant write verbs to every tenant user. Access remains scoped to the caller's own tenant. Do not remove these writes or move them to `admin_default`-only without a product decision that non-admin users no longer need the capability. When adding a new write verb to a `platform_default` role, update this table and use a `display_name` / `description` that reflects the privilege (do not rename immutable `name`).
+
+| Role `name` | File | Write permission(s) | Product justification |
+| --- | --- | --- | --- |
+| `RHC Viewer` | `configs/*/roles/config-manager.json` | `config-manager:activation_keys:write` | Every user must read RHC configuration and update activation keys. UI label is `display_name: "RHC user"` (immutable `name` kept for DB stability). |
+| `Inventory Hosts Administrator` | `configs/*/roles/inventory.json` | `inventory:hosts:write` | Every user must read and update Inventory host records (also `admin_default: true` so org admins retain the same grant). |
+| `Remediations user` | `configs/*/roles/remediations.json` | `remediations:remediation:write` | Every user must create, update, and delete remediations as part of standard Insights workflows. |
+| `Automation Analytics Editor` | `configs/*/roles/automation-analytics.json` | `automation-analytics:*:write` | Every user must read and update Automation Analytics resources without an explicit role assignment. |
+| `Insights administrator` | `configs/*/roles/insights.json` | `advisor:*:*` (includes `advisor:disable-recommendations:write`) | Every user must fully operate RHEL Advisor (view, disable recommendations, and related writes). UI label is `display_name: "RHEL Advisor administrator"`. |
+| `OCP Advisor administrator` | `configs/*/roles/ocp-advisor.json` | `ocp-advisor:*:*` (includes `ocp-advisor:toggle-recommendations:write`) | Every user must fully operate OCP Advisor, including toggling recommendations. |
 
 ## 5. Cross-Service Permission References
 
