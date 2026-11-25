@@ -7,15 +7,14 @@ GOBIN := $(shell go env GOPATH)/bin
 
 SCHEMA_REPO ?= project-kessel/starlark-unified-schema
 KSIL_SCHEMA_VERSION=v20260910.1
+KSL_VERSION := 850b3bf585557d877158c6fef06b715fa1e7f498
+RBAC_CONFIG_ACTIONS_VERSION := e2a043a1e319309c6f1b2e61839ac0a19dfd45eb
 
 .PHONY: init check check-go-tools test validate-roles invariants ksl-schema-stage ksl-test-schema-stage ksl-schema-prod ksl-test-schema-prod update-schemas
 
 init:
-	@HASH=$$(git ls-remote https://github.com/project-kessel/ksl-schema-language.git HEAD | cut -f1) && \
-	go install github.com/project-kessel/ksl-schema-language/cmd/ksl@$$HASH
-
-	@HASH=$$(git ls-remote https://github.com/project-kessel/rbac-config-actions.git HEAD | cut -f1) && \
-	go install github.com/project-kessel/rbac-config-actions/generate-v1-only-permissions/cmd/generate-v1-only-permissions@$$HASH
+	go install github.com/project-kessel/ksl-schema-language/cmd/ksl@$(KSL_VERSION)
+	go install github.com/project-kessel/rbac-config-actions/generate-v1-only-permissions/cmd/generate-v1-only-permissions@$(RBAC_CONFIG_ACTIONS_VERSION)
 
 # Everything a contributor can verify locally before opening a PR: the
 # validation scripts' own tests, role uniqueness, and a KSL compile of both

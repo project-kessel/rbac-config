@@ -54,6 +54,12 @@ Uses `authzed/action-spicedb-validate` to validate both generated `schema.zed` f
 - Run `make init` to install required tools (`ksl` and `generate-v1-only-permissions`)
 - Run `make check-go-tools` to verify installation
 
+`make init` installs both tools at the immutable commit IDs pinned in the
+Makefile. Update those pins through a reviewed PR after checking upstream
+changes and validating both stage and prod with the test schema targets below.
+Use `go version -m` on each installed binary to inspect its module version.
+These tool pins do not change roles, permissions, KSL relations, or role versions.
+
 ### Building Test Schemas Locally
 
 Use the test targets which write to `_private/test-schema/` (gitignored) instead of overwriting the committed `schema.zed` files:
