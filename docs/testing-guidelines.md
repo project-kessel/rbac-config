@@ -55,10 +55,23 @@ Uses `authzed/action-spicedb-validate` to validate both generated `schema.zed` f
 - Run `make check-go-tools` to verify installation
 
 `make init` installs both tools at the immutable commit IDs pinned in the
-Makefile. Update those pins through a reviewed PR after checking upstream
-changes and validating both stage and prod with the test schema targets below.
-Use `go version -m` on each installed binary to inspect its module version.
-These tool pins do not change roles, permissions, KSL relations, or role versions.
+Makefile. Use `go version -m` on each installed binary to inspect its module
+version. These tool pins do not change roles, permissions, KSL relations, or
+role versions.
+
+### Validating Tool Pin Updates
+
+Update pins through a reviewed PR after checking upstream changes. Install the
+updated tools, remove both generated permissions files, and validate both
+environments. The files depend on permission and list inputs, not on the
+installed generator, so existing files may otherwise be reused after an update.
+
+```sh
+make init
+rm -f configs/stage/schemas/src/rbac_v1_permissions.json configs/prod/schemas/src/rbac_v1_permissions.json
+make ksl-test-schema-stage
+make ksl-test-schema-prod
+```
 
 ### Building Test Schemas Locally
 
@@ -99,7 +112,7 @@ The Makefile encodes a dependency chain for production schema targets:
 1. `configs/{env}/schemas/src/rbac_v1_permissions.json` depends on `configs/{env}/permissions/*.json` + `configs/{env}/schemas/*.lst`
 2. `configs/{env}/schemas/schema.zed` depends on `configs/{env}/schemas/src/*.ksl` + the generated JSON
 
-The test schema targets (`ksl-test-schema-*`) are marked as `.PHONY` targets, which means they always run when invoked regardless of whether their dependencies have changed.
+The test schema targets (`ksl-test-schema-*`) are marked as `.PHONY` targets, which means they always compile when invoked. Their generated permissions prerequisites are rebuilt only when missing or older than their listed inputs.
 
 ## Repository Structure for Testing
 
